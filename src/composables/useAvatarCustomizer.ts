@@ -1,18 +1,18 @@
 import { ref } from "vue";
 
 // Exact refined palette from user:
-// - Tím (Quần): #b7aff3
-// - Xanh của quần áo (Áo & Giày): #daf0ad
+// - Tím (Quần & Giày): #b7aff3
+// - Xanh của áo: #daf0ad
 // - Xanh của tóc: #caf377
 // - Màu da: #f1d5c5
 export const DEFAULT_SHIRT_COLOR = "#daf0ad";
 export const DEFAULT_PANTS_COLOR = "#b7aff3";
-export const DEFAULT_SHOES_COLOR = "#daf0ad";
+export const DEFAULT_SHOES_COLOR = "#b7aff3";
 export const DEFAULT_HAIR_COLOR = "#caf377";
 export const DEFAULT_SKIN_COLOR = "#f1d5c5";
 
-// Auto-migrate cached localStorage to the refined palette
-const AVATAR_VERSION = "v4-refined-palette";
+// Auto-migrate cached localStorage to the refined purple shoes palette
+const AVATAR_VERSION = "v5-purple-shoes";
 if (typeof localStorage !== "undefined") {
   if (localStorage.getItem("avatar-version") !== AVATAR_VERSION) {
     localStorage.removeItem("avatar-shirt-color");
