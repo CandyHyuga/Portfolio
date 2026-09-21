@@ -111,6 +111,40 @@ const classes = computed(() => ["tag", `tag-variant-${props.variant}`]);
       background-color: #3178c6;
       color: white;
     }
+
+    &-blender {
+      background-color: #ea7600;
+      color: white;
+    }
+
+    &-steam {
+      background-color: #171a21;
+      color: #c7d5e0;
+      border-color: #66c0f4;
+    }
+
+    &-unreal {
+      background-color: #0e1118;
+      color: #ffffff;
+      border-color: rgba(255, 255, 255, 0.25);
+    }
+
+    &-unity {
+      background-color: #222c37;
+      color: #ffffff;
+      border-color: rgba(255, 255, 255, 0.25);
+    }
+
+    &-coop {
+      background-color: #059669;
+      color: #ffffff;
+    }
+
+    &-youngbuffalostudio {
+      background-color: #991b1b;
+      color: #ffffff;
+      border-color: rgba(255, 255, 255, 0.2);
+    }
   }
 }
 </style>

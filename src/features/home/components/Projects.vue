@@ -89,14 +89,14 @@ onMounted(loadPreviews);
     &-copy {
       font-weight: 900;
       letter-spacing: 0.02em;
-      font-size: var(--font-size-title-md);
+      font-size: calc(var(--font-size-title-md) + 5px);
 
       @include mixins.mq("sm") {
-        font-size: var(--font-size-title-lg);
+        font-size: calc(var(--font-size-title-lg) + 5px);
       }
 
       @include mixins.mq("xl") {
-        font-size: var(--font-size-title-xl);
+        font-size: calc(var(--font-size-title-xl) + 5px);
       }
     }
 

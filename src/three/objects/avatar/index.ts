@@ -1,5 +1,5 @@
 import { resources } from "../../../utils/resources";
-import { Mesh, Vector3, Euler, Group, ShaderMaterial, LinearSRGBColorSpace, Color } from "three";
+import { Mesh, Vector3, Euler, Group, ShaderMaterial, LinearSRGBColorSpace, Color, SkinnedMesh, Matrix4, BufferAttribute } from "three";
 import { scene } from "../../core/scene";
 import { animations } from "./animations";
 import { sceneWeights, sceneWeightsInOut } from "../../../animations/scenes";
@@ -160,6 +160,43 @@ const setupMesh = () => {
   mesh = cloneSkeleton(resource.scene.children[0]) as Mesh;
 
   mesh.frustumCulled = false;
+
+  // Find a skinned mesh to get skeleton
+  const blackMeshObj = mesh.getObjectByName("black") as SkinnedMesh;
+  const mainSkeleton = blackMeshObj?.skeleton;
+
+  // Convert any non-skinned meshes under armature to SkinnedMesh if skeleton exists
+  if (mainSkeleton) {
+    const toConvert: Mesh[] = [];
+    mesh.traverse((child) => {
+      if (child instanceof Mesh && !(child as any).isSkinnedMesh && child.parent) {
+        toConvert.push(child);
+      }
+    });
+
+    for (const child of toConvert) {
+      const geom = child.geometry;
+      if (!geom.attributes.skinIndex) {
+        const count = geom.attributes.position?.count ?? 0;
+        const skinIndex = new Uint8Array(count * 4);
+        const skinWeight = new Float32Array(count * 4);
+        for (let i = 0; i < count; i++) {
+          skinIndex[i * 4] = 10;
+          skinWeight[i * 4] = 1.0;
+        }
+        geom.setAttribute("skinIndex", new BufferAttribute(skinIndex, 4));
+        geom.setAttribute("skinWeight", new BufferAttribute(skinWeight, 4));
+      }
+
+      const skinned = new SkinnedMesh(geom, child.material);
+      skinned.name = child.name;
+      skinned.userData = child.userData;
+      skinned.bind(mainSkeleton, new Matrix4());
+      const parent = child.parent!;
+      parent.remove(child);
+      parent.add(skinned);
+    }
+  }
 
   mesh.traverse((child) => {
     if (child instanceof Mesh) {

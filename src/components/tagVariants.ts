@@ -19,7 +19,13 @@ export type TagVariant =
   | "nuxt"
   | "maps"
   | "flutter"
-  | "typescript";
+  | "typescript"
+  | "blender"
+  | "steam"
+  | "unreal"
+  | "unity"
+  | "coop"
+  | "youngbuffalostudio";
 
 export const tagLabels = {
   three: "Three.js",
@@ -43,4 +49,10 @@ export const tagLabels = {
   maps: "Google Maps",
   flutter: "Flutter",
   typescript: "TypeScript",
+  blender: "Blender 3D",
+  steam: "Steam",
+  unreal: "Unreal Engine",
+  unity: "Unity",
+  coop: "Co-op",
+  youngbuffalostudio: "YoungBuffaloStudio",
 } as const satisfies Record<TagVariant, string>;

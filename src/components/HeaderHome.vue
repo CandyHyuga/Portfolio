@@ -12,15 +12,9 @@ const handleLinkClick = (link: string) => {
   lenis.value.scrollTo(link);
 };
 
-type ActiveLink = "about" | "projects" | "certifications" | "contact";
+type ActiveLink = "about" | "projects" | "assets" | "contact";
 const activeLink = ref<ActiveLink | null>(null);
-const sections: ActiveLink[] = ["about", "projects", "certifications", "contact"];
-const ariaLabels = {
-  about: t("about"),
-  projects: t("projects"),
-  certifications: t("certifications"),
-  contact: t("contact"),
-};
+const sections: ActiveLink[] = ["about", "projects", "assets", "contact"];
 
 const isMounted = ref(false);
 
@@ -83,7 +77,7 @@ onMounted(() => {
         ]"
         @click="handleLinkClick('#' + section)"
         :is-dark-theme="isDarkTheme"
-        :aria-label="ariaLabels[section]"
+        :aria-label="t(section)"
         data-sound="click"
         data-hoversound="hover"
       >

@@ -2,6 +2,7 @@
 import { computed, ref, watchEffect, onBeforeUnmount } from "vue";
 import gsap from "gsap";
 import { t } from "../../../i18n/utils/translate";
+import { locale } from "../../../i18n/store";
 import AppearingText from "../../../components/AppearingText.vue";
 import { BREAKPOINTS } from "../../../utils/sizes";
 import { Vector3 } from "three";
@@ -105,24 +106,31 @@ const handleTimelineCreated = (timeline: gsap.core.Timeline, delay: number) => {
   timelines.value = updatedTimelines;
 };
 
-const SKILLS = [
-  { name: "JavaScript / TypeScript" },
-  { name: "Vue.js / Nuxt.js" },
-  { name: "Next.js / NestJS" },
-  { name: "React Native / Flutter" },
-  { name: "REST API" },
-  { name: "SQL / MongoDB" },
-  { name: "Docker / Jenkins" },
-  { name: "Git & GitHub" },
-  { name: "n8n Automation" },
-] as const satisfies { name: string }[];
-
-const services = computed(() => SKILLS);
+const services = computed(() => [
+  {
+    name:
+      locale.value === "vi"
+        ? "Phần mềm thiết kế: Adobe Photoshop, Adobe Illustrator, Adobe Substance 3D Painter"
+        : "Design Software: Adobe Photoshop, Adobe Illustrator, Adobe Substance 3D Painter",
+  },
+  {
+    name:
+      locale.value === "vi"
+        ? "Phần mềm 3D: Blender, Maya, 3ds Max, ZBrush"
+        : "3D Model Software: Blender, Maya, 3ds Max, ZBrush",
+  },
+  {
+    name:
+      locale.value === "vi"
+        ? "Phần mềm làm game: Unity, Unreal Engine, Godot"
+        : "Game Engine: Unity, Unreal Engine, Godot",
+  },
+]);
 </script>
 
 <template>
   <ProjectedElement :point="point">
-    <div ref="wrapperRef" class="box-services">
+    <div ref="wrapperRef" class="box-services" :class="{ 'is-vi': locale === 'vi' }">
       <div class="box-services-content">
         <div class="box-services-title">
           <AppearingText
@@ -178,8 +186,20 @@ const services = computed(() => SKILLS);
   }
 
   @include mixins.landscape-large {
-    width: 380px;
-    max-width: calc(var(--svw) * 36);
+    width: 420px;
+    max-width: calc(var(--svw) * 38);
+  }
+
+  &.is-vi {
+    @include mixins.landscape {
+      width: 560px;
+      max-width: calc(var(--svw) * 44);
+    }
+
+    @include mixins.landscape-large {
+      width: 520px;
+      max-width: calc(var(--svw) * 44);
+    }
   }
 
   &::after,
@@ -238,7 +258,7 @@ const services = computed(() => SKILLS);
   &-list {
     display: flex;
     flex-direction: column;
-    gap: var(--space-xs);
+    gap: var(--space-sm);
 
     &-item {
       display: flex;
@@ -258,14 +278,15 @@ const services = computed(() => SKILLS);
       }
 
       &-name {
-        font-size: var(--font-size-md);
+        font-size: var(--font-size-sm);
+        line-height: 1.4;
 
         @include mixins.landscape {
-          font-size: var(--font-size-sm);
+          font-size: var(--font-size-xs);
         }
 
         @include mixins.landscape-large {
-          font-size: var(--font-size-lg);
+          font-size: var(--font-size-sm);
         }
       }
     }

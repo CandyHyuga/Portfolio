@@ -16,12 +16,26 @@
   font-display: swap;
 }
 
-:root {
-  --font-sans: "Urbanist", "Segoe UI", Roboto, Arial, sans-serif;
-  --font-tech: "ProFontWindows", "Cascadia Mono", Consolas, monospace;
+@font-face {
+  font-family: "Mistral";
+  src: local("Mistral"), url("/fonts/mistral.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
 }
 
-/* ProFontWindows does not contain the complete Vietnamese glyph set. */
+:root {
+  --font-sans: "Times New Roman", Times, serif;
+  --font-tech: "Times New Roman", Times, serif;
+  --font-serif: "Times New Roman", Times, serif;
+}
+
 :root:lang(vi) {
-  --font-tech: var(--font-sans);
+  --font-sans: "Times New Roman", Times, serif;
+  --font-tech: "Times New Roman", Times, serif;
+  --font-serif: "Times New Roman", Times, serif;
+}
+
+*, *::before, *::after, html, body, button, input, select, textarea {
+  font-family: "Times New Roman", Times, serif !important;
 }

@@ -2,6 +2,7 @@
 import Layout from "../../../components/Layout.vue";
 import ProjectHero from "./ProjectHero.vue";
 import ProjectComponent from "./ProjectComponent.vue";
+import Project3DEnvironment from "./Project3DEnvironment.vue";
 import Link from "../../../components/Link.vue";
 import NextProject from "./NextProject.vue";
 import { locale } from "../../../i18n/store";
@@ -51,6 +52,12 @@ onMounted(loadPreviews);
         <ProjectComponent :type="component.type" :props="component.props" :index="index" />
       </div>
     </div>
+
+    <!-- 3D Environment Showcase Section (Matching user's red sketch) -->
+    <div class="project-content-env-wrapper">
+      <Project3DEnvironment :projectId="projectId" />
+    </div>
+
     <div class="grid project-content-next-project-grid">
       <Link
         v-if="nextProject"
@@ -69,6 +76,13 @@ onMounted(loadPreviews);
 <style scoped lang="scss">
 .project-content {
   color: var(--color-text-400);
+
+  &-env-wrapper {
+    width: 100%;
+    padding: 0 var(--space-outer);
+    margin-top: var(--space-xl);
+    margin-bottom: var(--space-md);
+  }
 
   &-grid {
     row-gap: var(--space-sm);

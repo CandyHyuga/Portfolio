@@ -1,41 +1,22 @@
 import type { ProjectPreview } from "../../types";
-import edumeeThumbnail from "../../../assets/thumbnails/edumee.png";
-import horsetrackThumbnail from "../../../assets/thumbnails/horsetrack.png";
-import ihouzzThumbnail from "../../../assets/thumbnails/ihouzz.png";
-import bookstoreThumbnail from "../../../assets/thumbnails/bookstore.png";
+import nightShippersThumbnail from "../../../assets/thumbnails/night-shippers.jpg";
+import gamblingGnomesThumbnail from "../../../assets/thumbnails/gambling-gnomes.png";
 
-import ihouzzLogo from "../../../assets/images/logos/ihouzz-logo.png";
-import truongThanhLogo from "../../../assets/images/logos/truong-thanh-logo.png";
-import horseTrackLogo from "../../../assets/images/logos/horsetrack-logo.png";
-import edumeeLogo from "../../../assets/images/logos/edumee-logo.png";
+import nightShippersLogo from "../../../assets/images/logos/night-shippers-logo.png";
 
 export default [
   {
-    title: "iHouzz.com",
-    slug: "ihouzz",
-    thumbnail: ihouzzThumbnail,
-    logo: ihouzzLogo,
-    description: "Ein umfassender Immobilienmarktplatz und eine PropTech-Plattform.",
+    title: "Night Shippers",
+    slug: "night-shippers",
+    thumbnail: nightShippersThumbnail,
+    logo: nightShippersLogo,
+    description: "3D-Environment & kooperatives Horror-Lieferdienst-Spiel in der Unterwelt auf Steam.",
   },
   {
-    title: "Trường Thành Stationery",
-    slug: "bookstore",
-    thumbnail: bookstoreThumbnail,
-    logo: truongThanhLogo,
-    description: "Ein voll ausgestatteter E-Commerce-Buchladen und eine Schreibwarenplattform.",
-  },
-  {
-    title: "HorseTrack",
-    slug: "horsetrack",
-    thumbnail: horsetrackThumbnail,
-    logo: horseTrackLogo,
-    description: "Ein dunkles Echtzeit-Analysedashboard für Pferderennen.",
-  },
-  {
-    title: "Edumee.me",
-    slug: "edumee",
-    thumbnail: edumeeThumbnail,
-    logo: edumeeLogo,
-    description: "Eine KI-gestützte Plattform zur Berufsorientierung für Schüler und Studenten.",
+    title: "Gambling Gnomes",
+    slug: "gambling-gnomes",
+    thumbnail: gamblingGnomesThumbnail,
+    logo: gamblingGnomesThumbnail,
+    description: "3D-Environment & düsteres Survival-Kartenspiel gegen listige Gnome.",
   },
 ] as const satisfies ProjectPreview[];

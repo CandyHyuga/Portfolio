@@ -57,7 +57,7 @@ const classNames = computed(() => {
   };
 });
 
-const resumeUrl = "https://drive.google.com/file/d/18zX6o6V0yHpsVPvF3gBj4mMqShABWGlH/view?usp=sharing";
+const resumeUrl = "/CandyHyuga_PDF.pdf";
 
 const resumeClassNames = computed(() => {
   return {
@@ -114,8 +114,8 @@ const resumeClassNames = computed(() => {
         <span>{{ t("resume") }}</span>
         <svg
           class="header-resume-icon"
-          width="13"
-          height="13"
+          width="48"
+          height="48"
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"
@@ -183,14 +183,14 @@ const resumeClassNames = computed(() => {
   &-resume {
     display: none;
     align-items: center;
-    gap: 6px;
+    gap: 8px;
     width: fit-content;
     border: 1.5px solid var(--color-text-400);
     color: var(--color-text-400);
     background-color: transparent;
     padding: 0 16px;
-    height: 38px;
-    font-size: var(--font-size-sm);
+    height: 48px;
+    font-size: var(--font-size-md);
     letter-spacing: 0.02em;
     font-weight: 800;
     text-transform: uppercase;
@@ -208,8 +208,8 @@ const resumeClassNames = computed(() => {
 
     @include mixins.mq("xl") {
       padding: 0 20px;
-      height: 44px;
-      font-size: var(--font-size-md);
+      height: 52px;
+      font-size: var(--font-size-lg);
     }
 
     &-isProjectPage {
@@ -217,15 +217,15 @@ const resumeClassNames = computed(() => {
     }
 
     &-icon {
-      width: 12px;
-      height: 12px;
+      width: 44px;
+      height: 44px;
       stroke: currentColor;
       transition: transform 0.2s var(--ease-smooth);
       flex-shrink: 0;
 
       @include mixins.mq("xl") {
-        width: 13px;
-        height: 13px;
+        width: 48px;
+        height: 48px;
       }
     }
 
@@ -236,7 +236,7 @@ const resumeClassNames = computed(() => {
         border-color: var(--color-black-400);
 
         .header-resume-icon {
-          transform: translate(2px, -2px);
+          transform: translate(3px, -3px);
         }
       }
     }

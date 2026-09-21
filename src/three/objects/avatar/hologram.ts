@@ -1,5 +1,5 @@
 import { resources } from "../../../utils/resources";
-import { Mesh, Matrix4, Vector3, BufferAttribute, Group, SkinnedMesh } from "three";
+import { Mesh, Matrix4, Vector3, BufferAttribute, Group, SkinnedMesh, BufferGeometry } from "three";
 //import { renderTarget } from "../../core/renderTarget";
 import { clone as cloneSkeleton } from "three/examples/jsm/utils/SkeletonUtils.js";
 import { getMaterial as getHologramMaterial, uniforms as hologramUniforms } from "./hologram-material";
@@ -9,7 +9,7 @@ import { sceneWeights } from "../../../animations/scenes";
 import { avatar } from ".";
 import { aboutProgress } from "../../../animations/transitions/about";
 
-import type { Material, BufferGeometry, Object3D, Skeleton } from "three";
+import type { Material, Object3D, Skeleton } from "three";
 
 const GEOMETRY_NAMES: string[] = ["black", "gray", "skin", "white", "head", "brain"];
 
@@ -42,35 +42,65 @@ const setupGeometry = () => {
   const resource = resources.items["avatar-model"];
   const geometries: BufferGeometry[] = [];
 
+  let sampleSkinIndex: any = null;
   resource.scene.children[0].traverse((child: Object3D) => {
-    if (child instanceof Mesh && GEOMETRY_NAMES.includes(child.name)) {
-      const geometry = child.geometry.clone();
-      geometries.push(geometry);
+    if (child instanceof Mesh && child.geometry.attributes.skinIndex) {
+      sampleSkinIndex = child.geometry.attributes.skinIndex;
     }
   });
 
-  //geometry = mergeGeometries(geometries).toNonIndexed();
-  geometry = mergeGeometries(geometries);
+  resource.scene.children[0].traverse((child: Object3D) => {
+    if (child instanceof Mesh && GEOMETRY_NAMES.includes(child.name)) {
+      const geom = child.geometry.clone();
+      if (!geom.attributes.skinIndex && sampleSkinIndex) {
+        const count = geom.attributes.position?.count ?? 0;
+        const Ctor = sampleSkinIndex.array.constructor;
+        const skinIndex = new Ctor(count * 4);
+        const skinWeight = new Float32Array(count * 4);
+        for (let i = 0; i < count; i++) {
+          skinIndex[i * 4] = 10;
+          skinWeight[i * 4] = 1.0;
+        }
+        geom.setAttribute("skinIndex", new BufferAttribute(skinIndex, 4));
+        geom.setAttribute("skinWeight", new BufferAttribute(skinWeight, 4));
+      }
+      geometries.push(geom);
+    }
+  });
+
+  const merged = mergeGeometries(geometries);
+  if (merged) {
+    geometry = merged;
+  } else if (geometries.length > 0 && geometries[0]) {
+    geometry = geometries[0].clone();
+  } else {
+    geometry = new BufferGeometry();
+  }
+
   geometry.toNonIndexed();
 
   const vectors = [new Vector3(1, 0, 0), new Vector3(0, 1, 0), new Vector3(0, 0, 1)];
 
-  const position = geometry.attributes.position!;
-  const centers = new Float32Array(position.count * 3);
-
-  for (let i = 0, l = position.count; i < l; i++) {
-    vectors[i % 3]!.toArray(centers, i * 3);
+  const position = geometry.attributes.position;
+  if (position) {
+    const centers = new Float32Array(position.count * 3);
+    for (let i = 0, l = position.count; i < l; i++) {
+      vectors[i % 3]!.toArray(centers, i * 3);
+    }
+    geometry.setAttribute("center", new BufferAttribute(centers, 3));
   }
-
-  geometry.setAttribute("center", new BufferAttribute(centers, 3));
 };
 
 const setupMesh = () => {
-  if (mesh) return;
+  if (mesh || !geometry) return;
   material = getHologramMaterial();
-  mesh = new SkinnedMesh(geometry!, material!);
-  mesh.bind(skeleton!, new Matrix4());
-  mesh.add(skeleton!.bones[0] as Object3D);
+  mesh = new SkinnedMesh(geometry, material!);
+  if (skeleton) {
+    mesh.bind(skeleton, new Matrix4());
+    if (skeleton.bones.length > 0 && skeleton.bones[0]) {
+      mesh.add(skeleton.bones[0] as Object3D);
+    }
+  }
   const resource = resources.items["avatar-model"];
 
   mesh.rotation.copy(resource.scene.children[0].rotation);

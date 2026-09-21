@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import type { Certificate } from "../../../content/certificates";
+import { t } from "../../../i18n/utils/translate";
 
 defineProps<{
   certificate: Certificate;
@@ -50,7 +51,7 @@ const isHovered = ref(false);
       <div class="cert-card-footer">
         <span class="cert-card-date">{{ certificate.date }}</span>
         <span class="cert-card-link">
-          View Certificate
+          {{ t("view-certificate") }}
           <svg class="cert-card-link-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M7 17L17 7" />
             <path d="M7 7h10v10" />

@@ -7,7 +7,7 @@ import { isDark } from "../../../composables/useTheme";
 
 import type { Object3D } from "three";
 
-const shadowColor = new Color("rgb(208, 185, 156)");
+const shadowColor = new Color("rgb(160, 160, 215)");
 
 const init = () => {
   initObjects();

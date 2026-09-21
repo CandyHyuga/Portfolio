@@ -5,6 +5,7 @@ import { BREAKPOINTS } from "../../../utils/sizes";
 import { Vector3 } from "three";
 import ProjectedElement from "../../../components/ProjectedElement.vue";
 import { t } from "../../../i18n/utils/translate";
+import { locale } from "../../../i18n/store";
 import AppearingText from "../../../components/AppearingText.vue";
 import PinIcon from "../../../components/icons/Pin.vue";
 
@@ -99,19 +100,27 @@ const handleTimelineCreated = (timeline: gsap.core.Timeline, delay: number) => {
     <div ref="wrapperRef" class="box-description">
       <div class="box-description-content">
         <div class="box-description-details">
-          <p class="box-description-details-name">Trương Hoàng</p>
+          <p class="box-description-details-name">Trương Ngọc Thiên Hương - 2003</p>
           <div class="box-description-details-location">
             <PinIcon class="box-description-details-location-icon" />
-            <p class="box-description-details-location-copy">{{ t("vietnam") }}</p>
+            <p class="box-description-details-location-copy">{{ locale === 'vi' ? 'TP. Hồ Chí Minh, Việt Nam' : 'Ho Chi Minh, Vietnam' }}</p>
           </div>
         </div>
         <div class="box-description-line"></div>
         <div class="box-description-copy">
+          <div class="box-description-title">
+            <AppearingText
+              :text="t('summary')"
+              :steps="1"
+              :duration="0.35"
+              @timeline:created="(tl: gsap.core.Timeline) => handleTimelineCreated(tl, 0)"
+            />
+          </div>
           <AppearingText
             :text="t('about-tagline')"
             :steps="3"
             :duration="0.7"
-            @timeline:created="(tl: gsap.core.Timeline) => handleTimelineCreated(tl, 0)"
+            @timeline:created="(tl: gsap.core.Timeline) => handleTimelineCreated(tl, 0.1)"
           />
         </div>
       </div>
@@ -166,6 +175,7 @@ const handleTimelineCreated = (timeline: gsap.core.Timeline, delay: number) => {
     }
 
     &-name {
+      font-family: var(--font-serif);
       font-size: var(--font-size-title-xs);
       font-weight: 700;
     }
@@ -233,6 +243,20 @@ const handleTimelineCreated = (timeline: gsap.core.Timeline, delay: number) => {
     }
   }
 
+  &-title {
+    font-size: var(--font-size-title-xs);
+    font-weight: 700;
+    margin-bottom: var(--space-xs);
+
+    @include mixins.landscape {
+      font-size: var(--font-size-title-xxs);
+    }
+
+    @include mixins.landscape-large {
+      font-size: var(--font-size-title-xs);
+    }
+  }
+
   &-copy {
     will-change: opacity;
     font-size: var(--font-size-md);
@@ -240,11 +264,12 @@ const handleTimelineCreated = (timeline: gsap.core.Timeline, delay: number) => {
 
     @include mixins.landscape {
       padding: 0;
-      font-size: var(--font-size-sm);
+      font-size: var(--font-size-xs);
     }
 
     @include mixins.landscape-large {
-      font-size: var(--font-size-lg);
+      font-size: var(--font-size-sm);
+      line-height: 1.5;
     }
   }
 }

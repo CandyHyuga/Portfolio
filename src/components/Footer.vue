@@ -56,7 +56,7 @@ const showAttribution = import.meta.env.VITE_SHOW_ATTRIBUTION !== "false";
               external
               data-cursor="circle-white"
               data-hoversound="hover"
-              >Trương Hoàng</Link
+              >Trương Ngọc Thiên Hương</Link
             >
           </Clickable>
         </div>
@@ -66,16 +66,16 @@ const showAttribution = import.meta.env.VITE_SHOW_ATTRIBUTION !== "false";
           </p>
           <Clickable renderAs="div">
             <Link
-              href="https://soundcloud.com/hmsurf"
+              href="https://soundcloud.com/whisky-time/y2matecom-differences-08x-ginuwine-pluggnb-remix-speed-song-720p"
               class="footer-link children-unclickable"
               external
               data-cursor="circle-white"
               data-hoversound="hover"
-              >HM Surf</Link
+              >Differences (0.8x Pluggnb Remix) — Ginuwine</Link
             >
           </Clickable>
         </div>
-        <p>© {{ new Date().getFullYear() }} Trương Hoàng</p>
+        <p>© {{ new Date().getFullYear() }} Trương Ngọc Thiên Hương</p>
       </div>
     </div>
   </footer>

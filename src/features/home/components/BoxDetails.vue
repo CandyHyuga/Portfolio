@@ -1,12 +1,14 @@
 <script setup lang="ts">
-import { t } from "../../../i18n/utils/translate";
-import { ref, watchEffect, onBeforeUnmount } from "vue";
+import { ref, computed, watchEffect, onBeforeUnmount } from "vue";
 import gsap from "gsap";
 import AppearingText from "../../../components/AppearingText.vue";
 import { BREAKPOINTS } from "../../../utils/sizes";
 import { Vector3 } from "three";
 import PinIcon from "../../../components/icons/Pin.vue";
 import ProjectedElement from "../../../components/ProjectedElement.vue";
+import { locale } from "../../../i18n/store";
+
+const locationText = computed(() => (locale.value === "vi" ? "TP. Hồ Chí Minh, Việt Nam" : "Ho Chi Minh, Vietnam"));
 
 const point = new Vector3(-0.76, 3.6, 6.75);
 
@@ -100,11 +102,11 @@ const handleTimelineCreated = (timeline: gsap.core.Timeline, delay: number) => {
 
 <template>
   <ProjectedElement :point="point">
-    <div ref="wrapperRef" class="box-details">
+    <div ref="wrapperRef" class="box-details" :class="{ 'is-vi': locale === 'vi' }">
       <div class="box-details-content">
         <div class="box-details-title">
           <AppearingText
-            text="Trương Hoàng"
+            text="Trương Ngọc Thiên Hương - 2003"
             :steps="1"
             :duration="0.35"
             @timeline:created="(tl: gsap.core.Timeline) => handleTimelineCreated(tl, 0)"
@@ -114,9 +116,8 @@ const handleTimelineCreated = (timeline: gsap.core.Timeline, delay: number) => {
           <div class="box-details-item">
             <PinIcon class="box-details-icon" />
             <AppearingText
-              v-if="t('vietnam')"
               class="box-details-content-copy"
-              :text="t('vietnam')"
+              :text="locationText"
               :steps="3"
               :duration="0.35"
               @timeline:created="(tl: gsap.core.Timeline) => handleTimelineCreated(tl, 0.1)"
@@ -139,13 +140,23 @@ const handleTimelineCreated = (timeline: gsap.core.Timeline, delay: number) => {
     position: absolute;
     padding-bottom: 3px;
     padding-right: var(--line-length);
-    width: 240px;
-    max-width: calc(var(--svw) * 30);
+    width: 270px;
+    max-width: calc(var(--svw) * 32);
     transform: translate(-100%, -50%);
+
+    &.is-vi {
+      width: 330px;
+      max-width: calc(var(--svw) * 40);
+    }
   }
 
   @include mixins.landscape-large {
-    width: 240px;
+    width: 270px;
+
+    &.is-vi {
+      width: 330px;
+      max-width: calc(var(--svw) * 40);
+    }
   }
 
   &::after,
@@ -201,6 +212,12 @@ const handleTimelineCreated = (timeline: gsap.core.Timeline, delay: number) => {
     }
   }
 
+  &-items {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
   &-item {
     display: flex;
     align-items: center;
@@ -221,8 +238,11 @@ const handleTimelineCreated = (timeline: gsap.core.Timeline, delay: number) => {
   }
 
   &-title {
+    font-family: var(--font-serif);
     font-size: var(--font-size-title-xxs);
     font-weight: 700;
+    letter-spacing: 0.01em;
+    line-height: 1.15;
 
     @include mixins.mq("md") {
       font-size: var(--font-size-title-sm);

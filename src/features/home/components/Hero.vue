@@ -11,7 +11,7 @@ import AppearingText from "../../../components/AppearingText.vue";
     <div class="hero-content grid">
       <div class="hero-content-inner" id="hero-content-inner">
         <div class="hero-content-copys">
-          <h1 class="hero-title">Trương<br />Hoàng</h1>
+          <h1 class="hero-title">Trương Ngọc<br />Thiên Hương</h1>
           <Banner class="hero-banner" :copy="t('job-title')" v-if="!preloaderVisible" animated />
         </div>
       </div>
@@ -69,6 +69,7 @@ import AppearingText from "../../../components/AppearingText.vue";
     &-copys {
       display: flex;
       flex-direction: column;
+      align-items: center;
       gap: var(--space-sm);
 
       @include mixins.mq("md") {
@@ -82,8 +83,11 @@ import AppearingText from "../../../components/AppearingText.vue";
   }
 
   &-title {
-    font-weight: 900;
-    letter-spacing: 0.02em;
+    font-family: var(--font-serif), "Times New Roman", Times, serif;
+    font-weight: 700;
+    letter-spacing: 0.01em;
+    text-align: center;
+    line-height: 1.1;
     font-size: var(--font-size-title-lg);
 
     @include mixins.landscape {
