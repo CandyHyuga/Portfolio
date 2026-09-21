@@ -1,14 +1,18 @@
 import { ref } from "vue";
 
-// Signature character colors: Lime Green Hair & Shirt, Purple Pants, Lime Green Shoes
-export const DEFAULT_SHIRT_COLOR = "#a8e038";
-export const DEFAULT_PANTS_COLOR = "#6c5ce7";
-export const DEFAULT_SHOES_COLOR = "#a8e038";
-export const DEFAULT_HAIR_COLOR = "#a8e038";
+// Exact palette requested by user:
+// - Màu tím quần: #b7aff3
+// - Màu xanh quần áo (áo & giày): #d3f58f
+// - Màu xanh tóc: #baf04c
+// - Màu da: #f1d5c5
+export const DEFAULT_SHIRT_COLOR = "#d3f58f";
+export const DEFAULT_PANTS_COLOR = "#b7aff3";
+export const DEFAULT_SHOES_COLOR = "#d3f58f";
+export const DEFAULT_HAIR_COLOR = "#baf04c";
 export const DEFAULT_SKIN_COLOR = "#f1d5c5";
 
-// Auto-migrate cached localStorage to the new signature lime-green & purple avatar
-const AVATAR_VERSION = "v2-lime-purple";
+// Auto-migrate cached localStorage to the exact signature palette
+const AVATAR_VERSION = "v3-exact-palette";
 if (typeof localStorage !== "undefined") {
   if (localStorage.getItem("avatar-version") !== AVATAR_VERSION) {
     localStorage.removeItem("avatar-shirt-color");
