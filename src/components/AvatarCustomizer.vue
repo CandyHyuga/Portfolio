@@ -18,10 +18,10 @@ const togglePanel = () => {
 };
 
 // Curated preset colors that look amazing in 3D
-const shirtPresets = ["#d3f58f", "#808080", "#ffffff", "#ff8400", "#34bfff", "#ff5c8a", "#ffd23f"];
+const shirtPresets = ["#daf0ad", "#808080", "#ffffff", "#ff8400", "#34bfff", "#ff5c8a", "#ffd23f"];
 const pantsPresets = ["#b7aff3", "#2d2a24", "#67727c", "#052e87", "#e9ded0", "#4f5d2f"];
-const shoesPresets = ["#d3f58f", "#ffffff", "#2d2a24", "#ff8400", "#34bfff", "#ff5c8a"];
-const hairPresets = ["#baf04c", "#2d2a24", "#d4a373", "#ccd5ae", "#e07a5f", "#f4f1de", "#3d348b"];
+const shoesPresets = ["#daf0ad", "#ffffff", "#2d2a24", "#ff8400", "#34bfff", "#ff5c8a"];
+const hairPresets = ["#caf377", "#2d2a24", "#d4a373", "#ccd5ae", "#e07a5f", "#f4f1de", "#3d348b"];
 const skinPresets = ["#f1d5c5", "#e0a98c", "#c68b6c", "#a16b4f", "#ffd8be"];
 
 const selectPreset = (type: "shirt" | "pants" | "shoes" | "hair" | "skin", color: string) => {
