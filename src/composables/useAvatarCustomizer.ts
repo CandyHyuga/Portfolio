@@ -1,11 +1,23 @@
 import { ref } from "vue";
 
-// Default to user's signature character: Lime Green Hair & Shirt, Purple Pants, Lime Green Shoes
+// Signature character colors: Lime Green Hair & Shirt, Purple Pants, Lime Green Shoes
 export const DEFAULT_SHIRT_COLOR = "#a8e038";
 export const DEFAULT_PANTS_COLOR = "#6c5ce7";
 export const DEFAULT_SHOES_COLOR = "#a8e038";
 export const DEFAULT_HAIR_COLOR = "#a8e038";
 export const DEFAULT_SKIN_COLOR = "#f1d5c5";
+
+// Auto-migrate cached localStorage to the new signature lime-green & purple avatar
+const AVATAR_VERSION = "v2-lime-purple";
+if (typeof localStorage !== "undefined") {
+  if (localStorage.getItem("avatar-version") !== AVATAR_VERSION) {
+    localStorage.removeItem("avatar-shirt-color");
+    localStorage.removeItem("avatar-pants-color");
+    localStorage.removeItem("avatar-shoes-color");
+    localStorage.removeItem("avatar-hair-color");
+    localStorage.setItem("avatar-version", AVATAR_VERSION);
+  }
+}
 
 const savedShirt = typeof localStorage !== "undefined" ? localStorage.getItem("avatar-shirt-color") : null;
 const savedPants = typeof localStorage !== "undefined" ? localStorage.getItem("avatar-pants-color") : null;
@@ -14,10 +26,10 @@ const savedHair = typeof localStorage !== "undefined" ? localStorage.getItem("av
 const savedSkin = typeof localStorage !== "undefined" ? localStorage.getItem("avatar-skin-color") : null;
 const savedExp = typeof localStorage !== "undefined" ? localStorage.getItem("avatar-face-expression") : null;
 
-export const shirtColor = ref(savedShirt && savedShirt !== "#34bfff" ? savedShirt : DEFAULT_SHIRT_COLOR);
-export const pantsColor = ref(savedPants && savedPants !== "#2d2a24" ? savedPants : DEFAULT_PANTS_COLOR);
-export const shoesColor = ref(savedShoes && savedShoes !== "#34bfff" ? savedShoes : DEFAULT_SHOES_COLOR);
-export const hairColor = ref(savedHair && savedHair !== "#2d2a24" ? savedHair : DEFAULT_HAIR_COLOR);
+export const shirtColor = ref(savedShirt || DEFAULT_SHIRT_COLOR);
+export const pantsColor = ref(savedPants || DEFAULT_PANTS_COLOR);
+export const shoesColor = ref(savedShoes || DEFAULT_SHOES_COLOR);
+export const hairColor = ref(savedHair || DEFAULT_HAIR_COLOR);
 export const skinColor = ref(savedSkin || DEFAULT_SKIN_COLOR);
 export const faceExpression = ref<string>(savedExp || "auto");
 
