@@ -57,7 +57,7 @@ const classNames = computed(() => {
   };
 });
 
-const resumeUrl = "/CandyHyuga_PDF.pdf";
+const resumeUrl = "https://drive.google.com/file/d/1Gcx5ywvfXiaNarTPl_9ItE1GSBomKjw-/view?usp=sharing";
 
 const resumeClassNames = computed(() => {
   return {

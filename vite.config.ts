@@ -17,7 +17,7 @@ export default defineConfig({
     strictPort: true,
     host: true,
     watch: {
-      ignored: ["**/public/models/**"],
+      ignored: ["**/public/models/**", "**/*.pdf"],
     },
   },
   resolve: {
