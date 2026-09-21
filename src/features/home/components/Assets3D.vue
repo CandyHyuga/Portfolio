@@ -1151,14 +1151,20 @@ const createRoughnessTexture = async (roughnessUrl: string, metallicUrl: string)
   }
 };
 
+const getAbsoluteAssetUrl = (path: string): string => {
+  if (path.startsWith("http://") || path.startsWith("https://") || path.startsWith("blob:")) return path;
+  const base = import.meta.env.BASE_URL ? import.meta.env.BASE_URL.replace(/\/$/, "") : "";
+  const cleanPath = path.startsWith("/") ? path : `/${path}`;
+  return `${base}${cleanPath}`;
+};
+
 const resolvePropTextureUrl = (prop: string, suffix: string, fileUrlMap?: Map<string, string>): string => {
   const fileName = `${prop}_${suffix}.png`;
   const lowerFileName = fileName.toLowerCase();
   if (fileUrlMap && fileUrlMap.has(lowerFileName)) {
     return fileUrlMap.get(lowerFileName)!;
   }
-  const base = import.meta.env.BASE_URL ? import.meta.env.BASE_URL.replace(/\/$/, "") : "";
-  return `${base}/models/concepts/realistic/textures/${fileName}`;
+  return getAbsoluteAssetUrl(`/models/concepts/realistic/textures/${fileName}`);
 };
 
 const buildRealisticPropMaterial = async (
@@ -1282,14 +1288,15 @@ const loadModelFromUrl = async (url: string, fileName: string, conceptId: string
       : `Loading ${fileName} • Blender 5.2...`;
 
   try {
-    const response = await fetch(url);
+    const fullUrl = getAbsoluteAssetUrl(url);
+    const response = await fetch(fullUrl);
     if (!response.ok) throw new Error("File not found: " + response.statusText);
     const arrayBuffer = await response.arrayBuffer();
     const fileSizeMb = (arrayBuffer.byteLength / (1024 * 1024)).toFixed(1);
     stats.value.fileSize = `${fileSizeMb} MB`;
     const ext = fileName.split(".").pop()?.toLowerCase();
     const manager = new LoadingManager();
-    const basePath = url.includes("/") ? url.substring(0, url.lastIndexOf("/") + 1) : "";
+    const basePath = fullUrl.includes("/") ? fullUrl.substring(0, fullUrl.lastIndexOf("/") + 1) : "";
 
     if (ext === "fbx") {
       const fbxLoader = new FBXLoader(manager);
