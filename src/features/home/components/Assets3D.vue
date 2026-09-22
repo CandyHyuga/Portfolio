@@ -66,7 +66,7 @@ let realisticEnvTexture: Texture | null = null;
 type ViewMode = "shaded" | "quads" | "overlay";
 const viewMode = ref<ViewMode>("shaded");
 const isWireframe = computed(() => viewMode.value !== "shaded");
-const isAutoRotate = ref(true);
+const isAutoRotate = ref(false);
 const isInteracting = ref(false);
 const hasInteracted = ref(false);
 const isDragOver = ref(false);
@@ -74,6 +74,16 @@ const isLoading = ref(false);
 const loadingMessage = ref(locale.value === "vi" ? "Đang nạp mô hình 3D..." : "Loading 3D model...");
 const showBlenderGuide = ref(false);
 const isNavGuideCollapsed = ref(false);
+
+// Check if running on local development/preview vs live production (GitHub Pages)
+const isLocal = computed(() => {
+  if (typeof window === "undefined") return false;
+  return (
+    import.meta.env.DEV ||
+    window.location.hostname === "localhost" ||
+    window.location.hostname === "127.0.0.1"
+  );
+});
 
 // Blender 5.2 Scale & Dimensions State
 type ScaleMode = "autofit" | "1x" | "3x" | "0.01x" | "100x";
@@ -259,10 +269,10 @@ const gamblingGnomesConcepts: EnvironmentConcept[] = [
     icon: "🍄",
     mood: "Whimsical & Fairy Tale",
     lighting: "Warm Mushroom Spore Glow",
-    polyTarget: "14,200 Δ",
+    polyTarget: "5,580 Δ",
     project: "gambling-gnomes",
-    defaultModelFile: "/models/concepts/mushroom-house/MushroomHouse.fbx",
-    defaultModelName: "MushroomHouse.fbx",
+    defaultModelFile: "/models/concepts/mushroom-house/NhaNam1.fbx",
+    defaultModelName: "NhaNam1.fbx",
   },
   {
     id: "water-lotus-pond",
@@ -306,10 +316,10 @@ const allConcepts = [
     icon: "🍄",
     mood: "Weathered & Atmospheric",
     lighting: "Dusk Forest Light & Candle",
-    polyTarget: "18,600 Δ",
+    polyTarget: "5,580 Δ",
     project: "gambling-gnomes" as const,
-    defaultModelFile: "/models/concepts/mushroom-house-realistic/MushroomHouse.fbx",
-    defaultModelName: "MushroomHouse.fbx",
+    defaultModelFile: "/models/concepts/mushroom-house-realistic/NhaNam1.fbx",
+    defaultModelName: "NhaNam1.fbx",
   },
   {
     id: "water-lotus-pond-realistic",
@@ -857,22 +867,17 @@ const fitCameraToModel = (model: Group, scaleMode: ScaleMode = currentScaleMode.
   let targetScale = 1.0;
   if (scaleMode === "autofit") {
     if (isCustomModel) {
-      // Model scale 2x larger (gấp 2 lần theo yêu cầu của user)
-      const sampleHeight = 5.2; // doubled from 2.6
-
-      // If the uploaded model is an elongated environment/map layout (height is much smaller than length/width):
+      const sampleHeight = 4.8;
       if (rawSize.y > 0 && rawSize.y < Math.max(rawSize.x, rawSize.z) * 0.45) {
-        // Scale so the buildings/stalls reach ~4.6m - 5.2m (gấp 2 lần), capping max length at 21m:
         const scaleForHumanHeight = sampleHeight / rawSize.y;
-        const scaleForLength = 21.0 / Math.max(rawSize.x, rawSize.z);
+        const scaleForLength = 10.0 / Math.max(rawSize.x, rawSize.z);
         targetScale = Math.min(scaleForHumanHeight, Math.max(scaleForLength, scaleForHumanHeight * 0.7));
       } else {
-        // Compact diorama or building (doubled from 3.6 -> 7.2):
-        targetScale = 7.2 / rawMaxDim;
+        targetScale = 4.8 / rawMaxDim;
       }
     } else {
       // Preset concept diorama:
-      targetScale = 3.5 / rawMaxDim;
+      targetScale = 4.2 / rawMaxDim;
     }
   } else if (scaleMode === "3x") {
     targetScale = 6.0;
@@ -900,11 +905,11 @@ const fitCameraToModel = (model: Group, scaleMode: ScaleMode = currentScaleMode.
   model.position.x = -scaledCenter.x;
   model.position.z = -scaledCenter.z;
 
-  // Showroom Pedestal logic: provide the exact gray circular pedestal disk as Hình 1
+  // Showroom Pedestal logic: provide clean circular pedestal disk for all models
+  const pRadius = Math.max(3.8, Math.max(scaledSize.x, scaledSize.z) * 0.62);
   if (customPedestalMesh) {
     if (isCustomModel) {
       customPedestalMesh.visible = true;
-      const pRadius = Math.max(3.8, Math.min(scaledSize.x, scaledSize.z) * 0.65, Math.max(scaledSize.x, scaledSize.z) * 0.35);
       const pScale = pRadius / 3.2;
       customPedestalMesh.scale.set(pScale, 1, pScale);
       customPedestalMesh.position.set(0, 0.125, 0);
@@ -919,9 +924,7 @@ const fitCameraToModel = (model: Group, scaleMode: ScaleMode = currentScaleMode.
   }
 
   // Ground grid and ring scale matching showroom
-  const ringRadius = isCustomModel
-    ? Math.max(4.0, Math.min(scaledMaxDim * 0.42, 10.0))
-    : Math.max(3.1, scaledMaxDim * 0.35);
+  const ringRadius = Math.max(pRadius * 1.08, scaledMaxDim * 0.45, 3.5);
 
   if (ringMesh) {
     const ringScale = ringRadius / 3.1;
@@ -932,33 +935,36 @@ const fitCameraToModel = (model: Group, scaleMode: ScaleMode = currentScaleMode.
     gridHelper.scale.set(gridScale, 1, gridScale);
   }
 
-  // Adjust camera distance and clipping planes so custom model appears truly 2x larger on screen (gấp đôi)
-  const fov = camera.fov * (Math.PI / 180);
-  let cameraDistance: number;
-  if (isCustomModel) {
-    // Bring camera 2x closer (distance reduced from ~6.0m to ~3.0m) to double visual magnification on screen
-    cameraDistance = Math.max(Math.min(scaledSize.y * 0.58, scaledMaxDim * 0.21), 2.9);
-  } else {
-    cameraDistance = Math.max(Math.abs(scaledMaxDim / 1.5 / Math.tan(fov / 2)) * 1.25, 3.8);
-  }
+  // Proper view frustum fitting so NO model is cropped or clips camera
+  const fovRad = camera.fov * (Math.PI / 180);
+  const aspect = camera.aspect || 1.6;
+  const distY = (scaledSize.y / 2) / Math.tan(fovRad / 2);
+  const distX = (Math.max(scaledSize.x, scaledSize.z) / 2) / (Math.tan(fovRad / 2) * Math.min(aspect, 1.8));
+  const cameraDistance = Math.max(distY, distX, 2.8) * 1.25;
 
   camera.near = Math.max(0.01, cameraDistance * 0.002);
   camera.far = Math.max(5000, cameraDistance * 40);
   camera.updateProjectionMatrix();
 
   const targetY = isCustomModel
-    ? Math.max(scaledSize.y * 0.38 + 0.25, 1.8)
+    ? Math.max(scaledSize.y * 0.42 + 0.25, 1.2)
     : scaledSize.y * 0.45;
   controls.target.set(0, targetY, 0);
 
+  // Temporarily pause autoRotate during camera animation to prevent camera fighting/diagonal oscillation
+  if (controls) controls.autoRotate = false;
+
   gsap.to(camera.position, {
-    x: cameraDistance * 0.85,
+    x: cameraDistance * 0.82,
     y: targetY + cameraDistance * 0.35,
     z: cameraDistance * 1.05,
     duration: 0.75,
     ease: "power2.out",
     onUpdate: () => {
       controls?.update();
+    },
+    onComplete: () => {
+      if (controls) controls.autoRotate = isAutoRotate.value;
     },
   });
 
@@ -1476,7 +1482,12 @@ const onFileInputChange = (e: Event) => {
   }
 };
 
+const onDragOver = () => {
+  if (isLocal.value) isDragOver.value = true;
+};
+
 const onDrop = (e: DragEvent) => {
+  if (!isLocal.value) return;
   isDragOver.value = false;
   if (e.dataTransfer?.files && e.dataTransfer.files.length > 0) {
     handle3DFiles(e.dataTransfer.files);
@@ -1583,8 +1594,8 @@ onUnmounted(() => {
     <div class="grid">
       <div
         class="assets-viewer-card"
-        :class="{ 'is-drag-over': isDragOver }"
-        @dragover.prevent="isDragOver = true"
+        :class="{ 'is-drag-over': isLocal && isDragOver }"
+        @dragover.prevent="onDragOver"
         @dragleave.prevent="isDragOver = false"
         @drop.prevent="onDrop"
         @mouseenter="onViewerMouseEnter"
@@ -1837,36 +1848,38 @@ onUnmounted(() => {
                 <span>{{ locale === 'vi' ? 'Hướng dẫn Blender' : 'Blender Guide' }}</span>
               </button>
 
-              <input
-                ref="fileInputRef"
-                type="file"
-                accept=".glb,.gltf,.fbx,.obj,.png,.jpg,.jpeg,.tga"
-                multiple
-                class="hidden-file-input"
-                @change="onFileInputChange"
-              />
-              <button
-                class="toolbar-btn upload-btn"
-                @click="fileInputRef?.click()"
-                :title="locale === 'vi' ? 'Hỗ trợ tệp FBX kèm texture hoặc GLB xuất từ Blender 5.2' : 'Supports textured FBX or GLB exported from Blender 5.2'"
-                data-sound="click"
-                data-hoversound="hover"
-              >
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                  <polyline points="17 8 12 3 7 8"></polyline>
-                  <line x1="12" y1="3" x2="12" y2="15"></line>
-                </svg>
-                <div class="upload-btn-text">
-                  <span>{{ locale === 'vi' ? 'Tải lên 3D (FBX / GLB)' : 'Upload 3D (FBX / GLB)' }}</span>
-                  <small>{{ locale === 'vi' ? 'Blender 5.2 • FBX kèm texture / GLB' : 'Blender 5.2 • Textured FBX / GLB' }}</small>
-                </div>
-              </button>
+              <template v-if="isLocal">
+                <input
+                  ref="fileInputRef"
+                  type="file"
+                  accept=".glb,.gltf,.fbx,.obj,.png,.jpg,.jpeg,.tga"
+                  multiple
+                  class="hidden-file-input"
+                  @change="onFileInputChange"
+                />
+                <button
+                  class="toolbar-btn upload-btn"
+                  @click="fileInputRef?.click()"
+                  :title="locale === 'vi' ? 'Hỗ trợ tệp FBX kèm texture hoặc GLB xuất từ Blender 5.2' : 'Supports textured FBX or GLB exported from Blender 5.2'"
+                  data-sound="click"
+                  data-hoversound="hover"
+                >
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="17 8 12 3 7 8"></polyline>
+                    <line x1="12" y1="3" x2="12" y2="15"></line>
+                  </svg>
+                  <div class="upload-btn-text">
+                    <span>{{ locale === 'vi' ? 'Tải lên 3D (FBX / GLB)' : 'Upload 3D (FBX / GLB)' }}</span>
+                    <small>{{ locale === 'vi' ? 'Blender 5.2 • FBX kèm texture / GLB' : 'Blender 5.2 • Textured FBX / GLB' }}</small>
+                  </div>
+                </button>
+              </template>
             </div>
           </div>
 
           <!-- Drag & Drop Overlay -->
-          <div v-if="isDragOver" class="drag-drop-modal">
+          <div v-if="isLocal && isDragOver" class="drag-drop-modal">
             <div class="drag-drop-content">
               <span class="upload-icon">📥</span>
               <p v-if="locale === 'vi'">Thả tệp <strong>.FBX (kèm textures)</strong> hoặc <strong>.GLB</strong> từ Blender 5.2 vào đây</p>
@@ -1912,7 +1925,7 @@ onUnmounted(() => {
               <span class="concept-name">{{ concept.name }}</span>
               <span class="concept-vi">{{ locale === 'vi' ? concept.nameVi : concept.nameEn }}</span>
             </div>
-            <span v-if="customModelNames.has(concept.id)" class="concept-custom-badge">Blender 📁</span>
+            <span v-if="isLocal && customModelNames.has(concept.id)" class="concept-custom-badge">Blender 📁</span>
           </button>
         </div>
       </div>
@@ -1940,7 +1953,7 @@ onUnmounted(() => {
               <span class="concept-name">{{ concept.name }}</span>
               <span class="concept-vi">{{ locale === 'vi' ? concept.nameVi : concept.nameEn }}</span>
             </div>
-            <span v-if="customModelNames.has(concept.id)" class="concept-custom-badge">Blender 📁</span>
+            <span v-if="isLocal && customModelNames.has(concept.id)" class="concept-custom-badge">Blender 📁</span>
           </button>
         </div>
       </div>

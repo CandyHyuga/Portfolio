@@ -14,9 +14,9 @@ Bạn có thể lưu trữ các file 3D (.fbx, .glb) trực tiếp vào các th�
 | `hoian-ancient-town/` | Hoi An Ancient Town / Phố Cổ Hội An | `HoiAn.fbx` |
 | `kowloon-walled-city/` | KowLoon Walled City / Cửu Long Thành Trại | `Cho.fbx` |
 | `ancient-lake/` | Ancient Lake / Hồ Cổ Tĩnh Lặng | `Cho.fbx` |
-| `mushroom-house/` | Mushroom House / Nhà nấm cổ tích (Stylized) | `MushroomHouse.fbx` |
+| `mushroom-house/` | Mushroom House / Nhà nấm cổ tích (Stylized) | `NhaNam1.fbx` (`MushroomHouse.fbx`) |
 | `water-lotus-pond/` | Water Lotus Pond / Đầm sen tươi tốt (Stylized) | `WaterLotusPond.fbx` |
-| `mushroom-house-realistic/` | Mushroom House / Nhà nấm cổ tích (Realistic) | `MushroomHouse.fbx` |
+| `mushroom-house-realistic/` | Mushroom House / Nhà nấm cổ tích (Realistic) | `NhaNam1.fbx` (`MushroomHouse.fbx`) |
 | `water-lotus-pond-realistic/` | Water Lotus Pond / Đầm sen tươi tốt (Realistic) | `WaterLotusPond.fbx` |
 
 ### 💡 Lưu ý khi xuất file từ Blender 5.2:
