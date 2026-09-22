@@ -605,7 +605,7 @@ function createFactory(): Group {
   return g;
 }
 
-// 10. Ancient Lake (Hồ Cổ Tĩnh Lặng)
+// 10. Ancient Market (Chợ Âm)
 function createAncientLake(): Group {
   const g = new Group();
   g.add(createBasePedestal(3.2, mats.waterLake));
