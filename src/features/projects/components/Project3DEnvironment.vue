@@ -18,6 +18,16 @@ const isDragOver = ref(false);
 const customImages = ref<EnvironmentImage[]>([]);
 const activeLightboxIndex = ref<number | null>(null);
 
+// Check if running on local development/preview vs live production (GitHub Pages)
+const isLocal = computed(() => {
+  if (typeof window === "undefined") return false;
+  return (
+    import.meta.env.DEV ||
+    window.location.hostname === "localhost" ||
+    window.location.hostname === "127.0.0.1"
+  );
+});
+
 // Built-in default images for projects (fallback if available)
 const defaultProjectImages: Record<string, string[]> = {
   "night-shippers": [],
@@ -140,7 +150,12 @@ const handleFileInput = (e: Event) => {
   }
 };
 
+const onDragOver = () => {
+  if (isLocal.value) isDragOver.value = true;
+};
+
 const handleDrop = (e: DragEvent) => {
+  if (!isLocal.value) return;
   isDragOver.value = false;
   if (e.dataTransfer?.files && e.dataTransfer.files.length > 0) {
     processFiles(Array.from(e.dataTransfer.files));
@@ -251,6 +266,7 @@ const handleKeydown = (e: KeyboardEvent) => {
       </div>
 
       <input
+        v-if="isLocal"
         ref="fileInputRef"
         type="file"
         accept=".png,.jpg,.jpeg,.webp"
@@ -263,8 +279,8 @@ const handleKeydown = (e: KeyboardEvent) => {
     <!-- Drop Zone & Cards Grid (3-column rounded rectangular boxes matching drawing) -->
     <div
       class="env-grid"
-      :class="{ 'is-dragging': isDragOver }"
-      @dragover.prevent="isDragOver = true"
+      :class="{ 'is-dragging': isLocal && isDragOver }"
+      @dragover.prevent="onDragOver"
       @dragleave.prevent="isDragOver = false"
       @drop.prevent="handleDrop"
     >
@@ -290,8 +306,9 @@ const handleKeydown = (e: KeyboardEvent) => {
             </span>
             <span class="card-label">{{ img.name }}</span>
 
-            <!-- Delete Image button on all cards -->
+            <!-- Delete Image button on all cards (only on local) -->
             <button
+              v-if="isLocal"
               class="delete-btn"
               @click.stop="deleteImage(img.id, img.name, $event)"
               :title="locale === 'vi' ? 'Loại bỏ ảnh này' : 'Delete image'"
@@ -306,8 +323,8 @@ const handleKeydown = (e: KeyboardEvent) => {
         </div>
       </div>
 
-      <!-- Add New Image Box (Rounded Rectangular Slot) -->
-      <div class="env-card add-card" @click="triggerFileInput">
+      <!-- Add New Image Box (Rounded Rectangular Slot) - only on local -->
+      <div v-if="isLocal" class="env-card add-card" @click="triggerFileInput">
         <div class="add-card-content">
           <div class="add-icon">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
@@ -336,6 +353,7 @@ const handleKeydown = (e: KeyboardEvent) => {
         <div class="lightbox-container" @click.stop>
           <div class="lightbox-top-bar">
             <button
+              v-if="isLocal"
               class="lightbox-delete-btn"
               @click.stop="deleteImage(activeLightboxImage.id, activeLightboxImage.name, $event)"
               :title="locale === 'vi' ? 'Loại bỏ ảnh này' : 'Remove this image'"
