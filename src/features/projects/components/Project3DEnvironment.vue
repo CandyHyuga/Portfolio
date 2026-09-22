@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, computed, watch, onMounted, onUnmounted } from "vue";
 import { locale } from "../../../i18n/store";
+import defaultEnvImages from "../../../content/projects/environmentImages.json";
 
 const props = defineProps<{
   projectId: string;
@@ -28,14 +29,16 @@ const isLocal = computed(() => {
   );
 });
 
-// Built-in default images for projects (fallback if available)
-const defaultProjectImages: Record<string, string[]> = {
-  "night-shippers": [],
-  "gambling-gnomes": [
-    "/images/projects/gambling-gnomes/3d-environment/gambling-gnomes-1.png",
-    "/images/projects/gambling-gnomes/3d-environment/gambling-gnomes-2.png",
-    "/images/projects/gambling-gnomes/3d-environment/gambling-gnomes-3.png",
-  ],
+// Built-in permanent images for projects (extracted and saved permanently in repository)
+const getPermanentImages = (pid: string): EnvironmentImage[] => {
+  const list = (defaultEnvImages as Record<string, { id: string; name: string; url: string }[]>)[pid] || [];
+  const base = import.meta.env.BASE_URL.replace(/\/$/, "");
+  return list.map((item) => ({
+    id: item.id,
+    name: item.name,
+    url: `${base}${item.url.startsWith("/") ? "" : "/"}${item.url}`,
+    isCustom: false,
+  }));
 };
 
 // IndexedDB Helper for persistent 3D environment images
@@ -98,26 +101,27 @@ const getImagesFromDB = async (pid: string): Promise<EnvironmentImage[] | null> 
 
 // Load images for current project
 const loadProjectImages = async () => {
-  const saved = await getImagesFromDB(props.projectId);
-  if (saved !== null) {
-    // Purge unwanted night-shippers default story screenshots if saved previously
-    const cleaned = saved.filter(
-      (img) => !img.url.includes("/night-shippers/3d-environment/night-shippers-")
-    );
-    customImages.value = cleaned;
-    if (cleaned.length !== saved.length) {
-      saveImagesToDB(props.projectId, cleaned);
+  const permanent = getPermanentImages(props.projectId);
+
+  if (isLocal.value) {
+    const saved = await getImagesFromDB(props.projectId);
+    if (saved !== null && saved.length > 0) {
+      // Purge unwanted night-shippers default story screenshots if saved previously
+      const cleaned = saved.filter(
+        (img) => !img.url.includes("/night-shippers/3d-environment/night-shippers-")
+      );
+      customImages.value = cleaned;
+      if (cleaned.length !== saved.length) {
+        saveImagesToDB(props.projectId, cleaned);
+      }
+      return;
     }
-  } else {
-    // Populate with default images if available
-    const defaults = defaultProjectImages[props.projectId] || [];
-    customImages.value = defaults.map((url, idx) => ({
-      id: `${props.projectId}-def-${idx}`,
-      name: url.split("/").pop() || `Render ${idx + 1}`,
-      url,
-      isCustom: true,
-    }));
-    saveImagesToDB(props.projectId, customImages.value);
+  }
+
+  // On production (GitHub Pages) or if local has no saved images, load permanent images
+  customImages.value = permanent;
+  if (isLocal.value && permanent.length > 0) {
+    saveImagesToDB(props.projectId, permanent);
   }
 };
 
