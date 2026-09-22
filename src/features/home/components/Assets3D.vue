@@ -167,7 +167,7 @@ const concepts: EnvironmentConcept[] = [
     icon: "🏡",
     mood: "Peaceful Countryside",
     lighting: "Golden Hour Warmth",
-    polyTarget: "16,800 Δ",
+    polyTarget: "18,400 Δ",
     project: "night-shippers",
     defaultModelFile: "/models/concepts/village/TayBac.fbx",
     defaultModelName: "TayBac.fbx",
