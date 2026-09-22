@@ -26,7 +26,7 @@ export default {
       type: "text",
       props: {
         title: "Thiết kế Môi trường 3D & Xây dựng Thế giới",
-        text: "Dựng hình toàn diện môi trường 3D, từ các con hẻm chật hẹp đặc trưng Việt Nam đến hành lang chung cư u ám bằng Blender, kết hợp ánh sáng thời gian thực để tạo chiều sâu thị giác sống động.",
+        text: "Xây dựng toàn diện môi trường 3D, từ các con hẻm chật hẹp đặc trưng Việt Nam đến hành lang chung cư u ám, kết hợp ánh sáng toả mờ từ xa để tạo chiều sâu thị giác sống động.",
       },
     },
     {
@@ -41,10 +41,10 @@ export default {
           props: {
             title: "Điểm nhấn Môi trường 3D & Kỹ thuật",
             items: [
-              "<strong>Môi trường 3D & Level Design:</strong> Quy hoạch modular ngõ hẻm đô thị, chung cư cũ và hành lang ngầm u tối.",
-              "<strong>3D Props & Tài nguyên:</strong> Xe máy giao hàng, thùng hàng và vật phẩm bối cảnh tối ưu topology chuẩn game.",
-              "<strong>Ánh sáng & Bầu không khí:</strong> Sương mù thể tích, đèn huỳnh quang chập chờn và tone màu neon ma mị.",
-              "<strong>Tối ưu hóa Game Engine:</strong> Shader thời gian thực, collision mesh và hệ thống LODs mượt mà cho co-op 8 người.",
+              "<strong>Môi trường 3D & Level Design:</strong> Quy hoạch khu ngõ hẻm đô thị, chung cư cũ và hành lang u tối.",
+              "<strong>3D Props & Tài nguyên:</strong> Xe máy giao hàng, thùng hàng và vật phẩm bối cảnh tối ưu mesh.",
+              "<strong>Ánh sáng & Bầu không khí:</strong> Sương mù, đèn huỳnh quang chập chờn và tone màu neon ma mị.",
+              "<strong>Tối ưu hóa Game Engine:</strong> Shader thời gian thực, trải nghiệm game mượt mà cho co-op 8 người dành cho tất cả hệ máy.",
             ],
           },
         },
