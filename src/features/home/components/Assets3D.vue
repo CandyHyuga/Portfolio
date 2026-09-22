@@ -1831,8 +1831,8 @@ onUnmounted(() => {
               </button>
             </div>
 
-            <!-- Upload & Blender Compatibility Actions -->
-            <div class="toolbar-upload-group">
+            <!-- Upload & Blender Compatibility Actions (Local Only) -->
+            <div v-if="isLocal" class="toolbar-upload-group">
               <button
                 class="toolbar-btn guide-btn"
                 @click="showBlenderGuide = true"
@@ -1959,8 +1959,8 @@ onUnmounted(() => {
       </div>
     </div>
 
-    <!-- Blender Export Guide Modal -->
-    <div v-if="showBlenderGuide" class="guide-modal-backdrop" @click.self="showBlenderGuide = false">
+    <!-- Blender Export Guide Modal (Local Only) -->
+    <div v-if="isLocal && showBlenderGuide" class="guide-modal-backdrop" @click.self="showBlenderGuide = false">
       <div class="guide-modal">
         <div class="guide-modal-header">
           <h3>{{ locale === 'vi' ? '📦 Hướng dẫn xuất file từ Blender 5.2 sang Web3D' : '📦 Blender 5.2 to Web3D Export Guide' }}</h3>
