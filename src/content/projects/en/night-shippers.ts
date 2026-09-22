@@ -59,13 +59,6 @@ export default {
         caption: "Supernatural Underworld Entities - Atmospheric lighting and environmental horror.",
       },
     },
-    {
-      type: "text",
-      props: {
-        title: "Steam Release & Community Impact",
-        text: "An indie co-op horror title on Steam showcasing environmental 3D storytelling, distinctive Vietnamese street culture, and engaging survival gameplay.",
-      },
-    },
   ],
 } as const satisfies ProjectContent;
 

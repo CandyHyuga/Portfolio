@@ -59,13 +59,6 @@ export default {
         caption: "Thực thể âm giới kỳ bí - Hệ thống ánh sáng và không gian kinh dị môi trường.",
       },
     },
-    {
-      type: "text",
-      props: {
-        title: "Phát hành trên Steam & Dấu ấn Cộng đồng",
-        text: "Tựa game co-op indie nổi bật trên Steam, khẳng định năng lực kể chuyện bằng thiết kế Môi trường 3D và mỹ thuật game độc đáo.",
-      },
-    },
   ],
 } as const satisfies ProjectContent;
 
