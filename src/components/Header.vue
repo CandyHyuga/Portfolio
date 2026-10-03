@@ -57,7 +57,7 @@ const classNames = computed(() => {
   };
 });
 
-const resumeUrl = "https://drive.google.com/file/d/1TsD_kenuxaLVLNoscO6vUOblx-oZXkth/view?usp=sharing";
+const resumeUrl = "https://drive.google.com/drive/folders/1k_kbNXAKxougWIqH3daZaXl_X8lc8vBF";
 
 const resumeClassNames = computed(() => {
   return {
