@@ -57,7 +57,7 @@ const classNames = computed(() => {
   };
 });
 
-const resumeUrl = `${import.meta.env.BASE_URL}TruongNgocThienHuong_Portfolio.pdf`;
+const resumeUrl = "https://drive.google.com/file/d/1TsD_kenuxaLVLNoscO6vUOblx-oZXkth/view?usp=sharing";
 
 const resumeClassNames = computed(() => {
   return {
