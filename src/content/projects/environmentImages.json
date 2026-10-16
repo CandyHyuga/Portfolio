@@ -292,5 +292,12 @@
       "name": "16.png",
       "url": "/images/projects/gambling-gnomes/3d-environment/16.png"
     }
+  ],
+  "personal-project": [
+    {
+      "id": "personal-project-1",
+      "name": "Astral Chamber.png",
+      "url": "/images/projects/personal-project/3d-environment/personal-project-1.png"
+    }
   ]
 }

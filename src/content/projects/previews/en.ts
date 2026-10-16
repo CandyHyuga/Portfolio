@@ -1,6 +1,7 @@
 import type { ProjectPreview } from "../../types";
 import nightShippersThumbnail from "../../../assets/thumbnails/night-shippers.jpg";
 import gamblingGnomesThumbnail from "../../../assets/thumbnails/gambling-gnomes.png";
+import personalProjectThumbnail from "../../../assets/thumbnails/personal-project.png";
 
 import nightShippersLogo from "../../../assets/images/logos/night-shippers-logo.png";
 
@@ -18,5 +19,12 @@ export default [
     thumbnail: gamblingGnomesThumbnail,
     logo: gamblingGnomesThumbnail,
     description: "3D Environment & dark survival card game against cunning, sinister gnomes.",
+  },
+  {
+    title: "Personal Project",
+    slug: "personal-project",
+    thumbnail: personalProjectThumbnail,
+    logo: personalProjectThumbnail,
+    description: "3D Environment Design & mystical astral chamber lighting diorama.",
   },
 ] as const satisfies ProjectPreview[];
