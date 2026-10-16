@@ -99,10 +99,36 @@ const loadProjectImages = async () => {
     const cleaned = saved.filter(
       (img) => !img.url.includes("/night-shippers/3d-environment/night-shippers-")
     );
-    customImages.value = cleaned;
-    if (cleaned.length !== saved.length) {
-      saveImagesToDB(props.projectId, cleaned);
-    }
+
+    // If saved images contain large base64 data URLs that now exist in permanent,
+    // upgrade them to use the lightweight permanent asset URLs
+    const permByName = new Map<string, EnvironmentImage>();
+    permanent.forEach((p) => permByName.set(p.name, p));
+
+    const updated = cleaned.map((img) => {
+      if (img.url.startsWith("data:") && permByName.has(img.name)) {
+        const perm = permByName.get(img.name)!;
+        return {
+          ...img,
+          id: perm.id,
+          url: perm.url,
+          isCustom: false,
+        };
+      }
+      return img;
+    });
+
+    // Also include any permanent images that aren't in saved (e.g., if newly added by repo)
+    const existingNames = new Set(updated.map((img) => img.name));
+    permanent.forEach((p) => {
+      if (!existingNames.has(p.name)) {
+        updated.push(p);
+        existingNames.add(p.name);
+      }
+    });
+
+    customImages.value = updated;
+    saveImagesToDB(props.projectId, updated);
     return;
   }
 
