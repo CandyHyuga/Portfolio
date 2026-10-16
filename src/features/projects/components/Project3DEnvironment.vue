@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { ref, computed, watch, onMounted, onUnmounted } from "vue";
-import { locale } from "../../../i18n/store";
 import defaultEnvImages from "../../../content/projects/environmentImages.json";
 
 const props = defineProps<{
@@ -14,8 +13,6 @@ export interface EnvironmentImage {
   isCustom?: boolean;
 }
 
-const fileInputRef = ref<HTMLInputElement | null>(null);
-const isDragOver = ref(false);
 const customImages = ref<EnvironmentImage[]>([]);
 const activeLightboxIndex = ref<number | null>(null);
 
@@ -155,86 +152,6 @@ onUnmounted(() => {
 // All displayed images
 const allImages = computed(() => customImages.value);
 
-// File upload handler
-const triggerFileInput = () => {
-  fileInputRef.value?.click();
-};
-
-const handleFileInput = (e: Event) => {
-  const target = e.target as HTMLInputElement;
-  if (target.files && target.files.length > 0) {
-    processFiles(Array.from(target.files));
-    target.value = ""; // Reset input so same file can be re-uploaded
-  }
-};
-
-const onDragOver = () => {
-  isDragOver.value = true;
-};
-
-const handleDrop = (e: DragEvent) => {
-  isDragOver.value = false;
-  if (e.dataTransfer?.files && e.dataTransfer.files.length > 0) {
-    processFiles(Array.from(e.dataTransfer.files));
-  }
-};
-
-const processFiles = (files: File[]) => {
-  const imageFiles = files.filter((f) => {
-    const ext = f.name.split(".").pop()?.toLowerCase();
-    return ext === "png" || ext === "jpg" || ext === "jpeg" || ext === "webp";
-  });
-
-  if (imageFiles.length === 0) {
-    alert(
-      locale.value === "vi"
-        ? "Vui lòng chọn file hình ảnh (.png, .jpg, .jpeg hoặc .webp) để trưng bày."
-        : "Please select image files (.png, .jpg, .jpeg, or .webp) to showcase."
-    );
-    return;
-  }
-
-  imageFiles.forEach((file) => {
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      const dataUrl = event.target?.result as string;
-      if (dataUrl) {
-        const newImg: EnvironmentImage = {
-          id: `custom-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`,
-          name: file.name,
-          url: dataUrl,
-          isCustom: true,
-        };
-        customImages.value.push(newImg);
-        saveImagesToDB(props.projectId, customImages.value);
-      }
-    };
-    reader.readAsDataURL(file);
-  });
-};
-
-const deleteImage = (id: string, name: string, e?: Event) => {
-  if (e) e.stopPropagation();
-  const confirmed = window.confirm(
-    locale.value === "vi"
-      ? `Bạn có chắc chắn muốn loại bỏ ảnh "${name}" không?`
-      : `Are you sure you want to remove "${name}"?`
-  );
-  if (!confirmed) return;
-
-  customImages.value = customImages.value.filter((img) => img.id !== id);
-  saveImagesToDB(props.projectId, customImages.value);
-
-  // If deleting currently active image in lightbox
-  if (activeLightboxIndex.value !== null) {
-    if (customImages.value.length === 0) {
-      closeLightbox();
-    } else if (activeLightboxIndex.value >= customImages.value.length) {
-      activeLightboxIndex.value = customImages.value.length - 1;
-    }
-  }
-};
-
 // Lightbox Modal
 const activeLightboxImage = computed(() => {
   if (activeLightboxIndex.value === null) return null;
@@ -280,38 +197,11 @@ const handleKeydown = (e: KeyboardEvent) => {
         <p class="env-subtitle">
           Environmental renders, lighting dioramas, and modular assets (PNG / JPG)
         </p>
-        <button
-          class="upload-btn"
-          @click="triggerFileInput"
-          :title="locale === 'vi' ? 'Tải lên hình ảnh 3D Render (.png, .jpg)' : 'Upload 3D Render images (.png, .jpg)'"
-        >
-          <svg class="icon-upload" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-            <polyline points="17 8 12 3 7 8"></polyline>
-            <line x1="12" y1="3" x2="12" y2="15"></line>
-          </svg>
-          <span>{{ locale === 'vi' ? 'Tải lên PNG / JPG' : 'Upload PNG / JPG' }}</span>
-        </button>
       </div>
-
-      <input
-        ref="fileInputRef"
-        type="file"
-        accept=".png,.jpg,.jpeg,.webp"
-        multiple
-        class="hidden-file-input"
-        @change="handleFileInput"
-      />
     </div>
 
-    <!-- Drop Zone & Cards Grid (3-column rounded rectangular boxes matching drawing) -->
-    <div
-      class="env-grid"
-      :class="{ 'is-dragging': isDragOver }"
-      @dragover.prevent="onDragOver"
-      @dragleave.prevent="isDragOver = false"
-      @drop.prevent="handleDrop"
-    >
+    <!-- Cards Grid (3-column rounded rectangular boxes matching drawing) -->
+    <div class="env-grid">
       <!-- Displayed Image Cards -->
       <div
         v-for="(img, idx) in allImages"
@@ -333,39 +223,7 @@ const handleKeydown = (e: KeyboardEvent) => {
               </svg>
             </span>
             <span class="card-label">{{ img.name }}</span>
-
-            <!-- Delete Image button on all cards -->
-            <button
-              class="delete-btn"
-              @click.stop="deleteImage(img.id, img.name, $event)"
-              :title="locale === 'vi' ? 'Loại bỏ ảnh này' : 'Delete image'"
-              :aria-label="locale === 'vi' ? 'Loại bỏ ảnh này' : 'Delete image'"
-            >
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <polyline points="3 6 5 6 21 6" />
-                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
-              </svg>
-            </button>
           </div>
-        </div>
-      </div>
-
-      <!-- Add New Image Box (Rounded Rectangular Slot) -->
-      <div class="env-card add-card" @click="triggerFileInput">
-        <div class="add-card-content">
-          <div class="add-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-              <rect x="3" y="3" width="18" height="18" rx="3" ry="3" />
-              <circle cx="8.5" cy="8.5" r="1.5" />
-              <polyline points="21 15 16 10 5 21" />
-            </svg>
-          </div>
-          <span class="add-text">
-            {{ locale === "vi" ? "+ Thêm ảnh 3D Render" : "+ Add 3D Render" }}
-          </span>
-          <span class="add-subtext">
-            {{ locale === "vi" ? "PNG / JPG (Lưu trữ vĩnh viễn)" : "PNG / JPG (Permanent Save)" }}
-          </span>
         </div>
       </div>
     </div>
@@ -379,18 +237,6 @@ const handleKeydown = (e: KeyboardEvent) => {
       >
         <div class="lightbox-container" @click.stop>
           <div class="lightbox-top-bar">
-            <button
-              class="lightbox-delete-btn"
-              @click.stop="deleteImage(activeLightboxImage.id, activeLightboxImage.name, $event)"
-              :title="locale === 'vi' ? 'Loại bỏ ảnh này' : 'Remove this image'"
-            >
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <polyline points="3 6 5 6 21 6" />
-                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
-              </svg>
-              <span>{{ locale === "vi" ? "Loại bỏ ảnh" : "Remove" }}</span>
-            </button>
-
             <button class="lightbox-close" @click="closeLightbox" aria-label="Close">
               ✕
             </button>

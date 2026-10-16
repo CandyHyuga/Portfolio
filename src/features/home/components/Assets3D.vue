@@ -1059,57 +1059,13 @@ const setScaleMode = (mode: ScaleMode) => {
 // 4. Normal = Normal_OpenGL.png (Tangent Space) + Bump Height.png (Distance 0.001)
 // =========================================================================
 
-const isRealisticTarget = (fileName?: string, conceptId?: string, object?: Group): boolean => {
+const isRealisticTarget = (fileName?: string, conceptId?: string, _object?: Group): boolean => {
   const fName = (fileName || "").toLowerCase();
   const cId = (conceptId || "").toLowerCase();
 
-  // 1. If fileName is Realistic.fbx or contains "realistic" (and not mushroom/lotus):
-  if (fName.includes("realistic") && !fName.includes("mushroom") && !fName.includes("lotus") && !fName.includes("pond")) {
+  // ONLY the dedicated "Realistic Props" concept slot (id: "realistic") or file named "realistic.fbx":
+  if (cId === "realistic" || cId === "realistic-props" || fName === "realistic.fbx") {
     return true;
-  }
-
-  // 2. If conceptId is explicitly the realistic props concept:
-  if (cId === "realistic" || cId === "realistic-props") {
-    return true;
-  }
-
-  // 3. Strictly preserve all other models (e.g. Mushroom House, Water Lotus Pond)
-  if (
-    fName.includes("mushroom") ||
-    fName.includes("lotus") ||
-    fName.includes("pond") ||
-    cId.includes("mushroom") ||
-    cId.includes("lotus") ||
-    cId.includes("pond")
-  ) {
-    return false;
-  }
-
-  // 4. Check if meshes in object match the 5 realistic props
-  if (object) {
-    let hasRealisticProp = false;
-    object.traverse((child) => {
-      if (child instanceof Mesh) {
-        const mName = (child.name || "").toLowerCase();
-        const mat = child.material;
-        const matName = (Array.isArray(mat) ? mat[0]?.name : (mat as any)?.name || "").toLowerCase();
-        if (
-          matName === "candle2" ||
-          matName === "winebarrel" ||
-          matName === "barrel" ||
-          matName === "box" ||
-          matName === "stool" ||
-          mName.includes("candle") ||
-          mName.includes("winebarrel") ||
-          mName.includes("cylinder008") ||
-          (mName === "box" && matName === "box") ||
-          (mName === "stool" && matName === "stool")
-        ) {
-          hasRealisticProp = true;
-        }
-      }
-    });
-    if (hasRealisticProp) return true;
   }
 
   return false;
@@ -1949,32 +1905,6 @@ onUnmounted(() => {
                 class="hidden-file-input"
                 @change="onFileInputChange"
               />
-              <button
-                class="toolbar-btn upload-btn"
-                @click="fileInputRef?.click()"
-                :title="locale === 'vi' ? 'Hỗ trợ tệp FBX kèm texture hoặc GLB xuất từ Blender 5.2' : 'Supports textured FBX or GLB exported from Blender 5.2'"
-                data-sound="click"
-                data-hoversound="hover"
-              >
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                  <polyline points="17 8 12 3 7 8"></polyline>
-                  <line x1="12" y1="3" x2="12" y2="15"></line>
-                </svg>
-                <div class="upload-btn-text">
-                  <span>{{ locale === 'vi' ? 'Tải lên 3D (FBX / GLB)' : 'Upload 3D (FBX / GLB)' }}</span>
-                  <small>{{ locale === 'vi' ? 'Blender 5.2 • FBX kèm texture / GLB' : 'Blender 5.2 • Textured FBX / GLB' }}</small>
-                </div>
-              </button>
-            </div>
-          </div>
-
-          <!-- Drag & Drop Overlay -->
-          <div v-if="isDragOver" class="drag-drop-modal">
-            <div class="drag-drop-content">
-              <span class="upload-icon">📥</span>
-              <p v-if="locale === 'vi'">Thả tệp <strong>.FBX (kèm textures)</strong> hoặc <strong>.GLB</strong> từ Blender 5.2 vào đây</p>
-              <p v-else>Drop <strong>.FBX (with textures)</strong> or <strong>.GLB</strong> files from Blender 5.2 here</p>
             </div>
           </div>
 
@@ -2016,7 +1946,6 @@ onUnmounted(() => {
               <span class="concept-name">{{ concept.name }}</span>
               <span class="concept-vi">{{ locale === 'vi' ? concept.nameVi : concept.nameEn }}</span>
             </div>
-            <span v-if="customModelNames.has(concept.id)" class="concept-custom-badge">Blender 📁</span>
           </button>
         </div>
       </div>
@@ -2044,7 +1973,6 @@ onUnmounted(() => {
               <span class="concept-name">{{ concept.name }}</span>
               <span class="concept-vi">{{ locale === 'vi' ? concept.nameVi : concept.nameEn }}</span>
             </div>
-            <span v-if="customModelNames.has(concept.id)" class="concept-custom-badge">Blender 📁</span>
           </button>
         </div>
       </div>
@@ -2072,7 +2000,6 @@ onUnmounted(() => {
               <span class="concept-name">{{ concept.name }}</span>
               <span class="concept-vi">{{ locale === 'vi' ? concept.nameVi : concept.nameEn }}</span>
             </div>
-            <span v-if="customModelNames.has(concept.id)" class="concept-custom-badge">Blender 📁</span>
           </button>
         </div>
       </div>
