@@ -100,7 +100,7 @@ interface EnvironmentConcept {
   polyTarget: string;
   defaultModelFile?: string;
   defaultModelName?: string;
-  project?: "night-shippers" | "gambling-gnomes";
+  project?: "night-shippers" | "gambling-gnomes" | "personal-project";
   textureType?: "stylized" | "realistic";
 }
 
@@ -336,9 +336,28 @@ const gamblingGnomesConcepts: EnvironmentConcept[] = [
   },
 ];
 
+// Concepts for Personal Project
+const personalProjectConcepts: EnvironmentConcept[] = [
+  {
+    id: "magic-room",
+    name: "Magic Room",
+    nameVi: "căn phòng ma thuật",
+    nameEn: "can phong ma thuat",
+    category: "Mystical Interior",
+    icon: "🔮",
+    mood: "Mystical Astral Chamber",
+    lighting: "Candlelight & Ethereal Glow",
+    polyTarget: "16,500 Δ",
+    project: "personal-project",
+    defaultModelFile: "/models/concepts/magic-room/MagicRoom.fbx",
+    defaultModelName: "MagicRoom.fbx",
+  },
+];
+
 const allConcepts = [
   ...concepts,
   ...gamblingGnomesConcepts,
+  ...personalProjectConcepts,
   {
     id: "mushroom-house-realistic",
     name: "Mushroom House",
@@ -2014,6 +2033,34 @@ onUnmounted(() => {
         <div class="shelf-cards">
           <button
             v-for="concept in gamblingGnomesConcepts"
+            :key="concept.id"
+            class="concept-card"
+            :class="{ active: selectedConceptId === concept.id }"
+            @click="loadConcept(concept.id)"
+            data-sound="click"
+            data-hoversound="hover"
+          >
+            <div class="concept-info">
+              <span class="concept-name">{{ concept.name }}</span>
+              <span class="concept-vi">{{ locale === 'vi' ? concept.nameVi : concept.nameEn }}</span>
+            </div>
+            <span v-if="customModelNames.has(concept.id)" class="concept-custom-badge">Blender 📁</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Shelf 3: Personal Project -->
+      <div class="assets-shelf gnome-shelf personal-shelf">
+        <div class="shelf-header-bar gnome-header-bar personal-header-bar">
+          <div class="shelf-label">
+            <span class="label-badge">{{ locale === 'vi' ? 'CHỌN' : 'SELECT' }}</span>
+            <span class="gnome-title">{{ locale === 'vi' ? 'Dự án cá nhân :' : 'Personal Project :' }}</span>
+          </div>
+        </div>
+
+        <div class="shelf-cards">
+          <button
+            v-for="concept in personalProjectConcepts"
             :key="concept.id"
             class="concept-card"
             :class="{ active: selectedConceptId === concept.id }"

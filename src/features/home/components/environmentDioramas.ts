@@ -1371,6 +1371,79 @@ function createConstella(): Group {
   return g;
 }
 
+// 19. Magic Room (Astral Attic Chamber & Magic Props)
+function createMagicRoom(): Group {
+  const g = new Group();
+  const roomBaseMat = new MeshBasicMaterial({ color: 0x181329 });
+  const woodFloorMat = new MeshBasicMaterial({ color: 0x3d271d });
+  const wallMat = new MeshBasicMaterial({ color: 0x221838 });
+  const tableMat = new MeshBasicMaterial({ color: 0x4a2e1b });
+  const candleMat = new MeshBasicMaterial({ color: 0xf4eedb });
+  const flameMat = new MeshBasicMaterial({ color: 0xffa040 });
+  const orbMat = new MeshBasicMaterial({ color: 0xbb86fc, transparent: true, opacity: 0.88 });
+  const starMat = new MeshBasicMaterial({ color: 0xffd166 });
+  const bookMat = new MeshBasicMaterial({ color: 0x8a2be2 });
+
+  g.add(createBasePedestal(3.2, roomBaseMat));
+
+  // Wooden Attic Floor
+  const floor = new Mesh(new BoxGeometry(3.0, 0.08, 3.0), woodFloorMat);
+  floor.position.set(0, 0.28, 0);
+  g.add(floor);
+
+  // Sloped Attic Back Wall
+  const wall = new Mesh(new BoxGeometry(2.8, 2.2, 0.12), wallMat);
+  wall.position.set(0, 1.35, -1.35);
+  g.add(wall);
+
+  // Center Ritual Round Table
+  const tableTop = new Mesh(new CylinderGeometry(0.75, 0.75, 0.08, 24), tableMat);
+  tableTop.position.set(0, 0.95, 0);
+  const tableLeg = new Mesh(new CylinderGeometry(0.12, 0.18, 0.65, 12), tableMat);
+  tableLeg.position.set(0, 0.62, 0);
+  g.add(tableTop, tableLeg);
+
+  // Glowing Crystal Orb on Table
+  const orb = new Mesh(new SphereGeometry(0.24, 20, 20), orbMat);
+  orb.position.set(0, 1.25, 0);
+  g.add(orb);
+
+  // Candles on Table
+  const candleCoords: Array<[number, number]> = [
+    [-0.35, -0.2],
+    [0.35, -0.15],
+    [0.1, 0.35],
+  ];
+  candleCoords.forEach(([cx, cz]) => {
+    const candle = new Mesh(new CylinderGeometry(0.03, 0.03, 0.16, 8), candleMat);
+    candle.position.set(cx, 1.06, cz);
+    const flame = new Mesh(new ConeGeometry(0.025, 0.06, 6), flameMat);
+    flame.position.set(cx, 1.18, cz);
+    g.add(candle, flame);
+  });
+
+  // Magic Spell Book
+  const book = new Mesh(new BoxGeometry(0.3, 0.05, 0.22), bookMat);
+  book.position.set(-0.25, 1.02, 0.2);
+  book.rotation.y = 0.4;
+  g.add(book);
+
+  // Floating Constellation Golden Stars
+  for (let i = 0; i < 6; i++) {
+    const angle = (i / 6) * Math.PI * 2;
+    const rad = 1.1 + (i % 2) * 0.35;
+    const star = new Mesh(new SphereGeometry(0.07, 8, 8), starMat);
+    star.position.set(Math.cos(angle) * rad, 1.7 + Math.sin(angle * 2) * 0.3, Math.sin(angle) * rad);
+    g.add(star);
+  }
+
+  const magicLight = new PointLight(0xc77dff, 2.2, 6.0);
+  magicLight.position.set(0, 1.8, 0);
+  g.add(magicLight);
+
+  return g;
+}
+
 export function createConceptDiorama(conceptId: string): Group {
   switch (conceptId) {
     case "hanoi-train-street":
@@ -1415,6 +1488,8 @@ export function createConceptDiorama(conceptId: string): Group {
       return createPlanet();
     case "alien-farm":
       return createAlienFarm();
+    case "magic-room":
+      return createMagicRoom();
     case "constella":
       return createConstella();
     default:
