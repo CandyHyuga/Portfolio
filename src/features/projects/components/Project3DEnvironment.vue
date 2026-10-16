@@ -19,16 +19,6 @@ const isDragOver = ref(false);
 const customImages = ref<EnvironmentImage[]>([]);
 const activeLightboxIndex = ref<number | null>(null);
 
-// Check if running on local development/preview vs live production (GitHub Pages)
-const isLocal = computed(() => {
-  if (typeof window === "undefined") return false;
-  return (
-    import.meta.env.DEV ||
-    window.location.hostname === "localhost" ||
-    window.location.hostname === "127.0.0.1"
-  );
-});
-
 // Built-in permanent images for projects (extracted and saved permanently in repository)
 const getPermanentImages = (pid: string): EnvironmentImage[] => {
   const list = (defaultEnvImages as Record<string, { id: string; name: string; url: string }[]>)[pid] || [];
@@ -103,24 +93,22 @@ const getImagesFromDB = async (pid: string): Promise<EnvironmentImage[] | null> 
 const loadProjectImages = async () => {
   const permanent = getPermanentImages(props.projectId);
 
-  if (isLocal.value) {
-    const saved = await getImagesFromDB(props.projectId);
-    if (saved !== null && saved.length > 0) {
-      // Purge unwanted night-shippers default story screenshots if saved previously
-      const cleaned = saved.filter(
-        (img) => !img.url.includes("/night-shippers/3d-environment/night-shippers-")
-      );
-      customImages.value = cleaned;
-      if (cleaned.length !== saved.length) {
-        saveImagesToDB(props.projectId, cleaned);
-      }
-      return;
+  const saved = await getImagesFromDB(props.projectId);
+  if (saved !== null && saved.length > 0) {
+    // Purge unwanted night-shippers default story screenshots if saved previously
+    const cleaned = saved.filter(
+      (img) => !img.url.includes("/night-shippers/3d-environment/night-shippers-")
+    );
+    customImages.value = cleaned;
+    if (cleaned.length !== saved.length) {
+      saveImagesToDB(props.projectId, cleaned);
     }
+    return;
   }
 
-  // On production (GitHub Pages) or if local has no saved images, load permanent images
+  // Load permanent images if no saved custom images exist
   customImages.value = permanent;
-  if (isLocal.value && permanent.length > 0) {
+  if (permanent.length > 0) {
     saveImagesToDB(props.projectId, permanent);
   }
 };
@@ -155,11 +143,10 @@ const handleFileInput = (e: Event) => {
 };
 
 const onDragOver = () => {
-  if (isLocal.value) isDragOver.value = true;
+  isDragOver.value = true;
 };
 
 const handleDrop = (e: DragEvent) => {
-  if (!isLocal.value) return;
   isDragOver.value = false;
   if (e.dataTransfer?.files && e.dataTransfer.files.length > 0) {
     processFiles(Array.from(e.dataTransfer.files));
@@ -267,10 +254,21 @@ const handleKeydown = (e: KeyboardEvent) => {
         <p class="env-subtitle">
           Environmental renders, lighting dioramas, and modular assets (PNG / JPG)
         </p>
+        <button
+          class="upload-btn"
+          @click="triggerFileInput"
+          :title="locale === 'vi' ? 'Tải lên hình ảnh 3D Render (.png, .jpg)' : 'Upload 3D Render images (.png, .jpg)'"
+        >
+          <svg class="icon-upload" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+            <polyline points="17 8 12 3 7 8"></polyline>
+            <line x1="12" y1="3" x2="12" y2="15"></line>
+          </svg>
+          <span>{{ locale === 'vi' ? 'Tải lên PNG / JPG' : 'Upload PNG / JPG' }}</span>
+        </button>
       </div>
 
       <input
-        v-if="isLocal"
         ref="fileInputRef"
         type="file"
         accept=".png,.jpg,.jpeg,.webp"
@@ -283,7 +281,7 @@ const handleKeydown = (e: KeyboardEvent) => {
     <!-- Drop Zone & Cards Grid (3-column rounded rectangular boxes matching drawing) -->
     <div
       class="env-grid"
-      :class="{ 'is-dragging': isLocal && isDragOver }"
+      :class="{ 'is-dragging': isDragOver }"
       @dragover.prevent="onDragOver"
       @dragleave.prevent="isDragOver = false"
       @drop.prevent="handleDrop"
@@ -310,9 +308,8 @@ const handleKeydown = (e: KeyboardEvent) => {
             </span>
             <span class="card-label">{{ img.name }}</span>
 
-            <!-- Delete Image button on all cards (only on local) -->
+            <!-- Delete Image button on all cards -->
             <button
-              v-if="isLocal"
               class="delete-btn"
               @click.stop="deleteImage(img.id, img.name, $event)"
               :title="locale === 'vi' ? 'Loại bỏ ảnh này' : 'Delete image'"
@@ -327,8 +324,8 @@ const handleKeydown = (e: KeyboardEvent) => {
         </div>
       </div>
 
-      <!-- Add New Image Box (Rounded Rectangular Slot) - only on local -->
-      <div v-if="isLocal" class="env-card add-card" @click="triggerFileInput">
+      <!-- Add New Image Box (Rounded Rectangular Slot) -->
+      <div class="env-card add-card" @click="triggerFileInput">
         <div class="add-card-content">
           <div class="add-icon">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
@@ -338,10 +335,10 @@ const handleKeydown = (e: KeyboardEvent) => {
             </svg>
           </div>
           <span class="add-text">
-            {{ locale === "vi" ? "+ Add 3D Render" : "+ Add 3D Render" }}
+            {{ locale === "vi" ? "+ Thêm ảnh 3D Render" : "+ Add 3D Render" }}
           </span>
           <span class="add-subtext">
-            {{ locale === "vi" ? "PNG / JPG (Permanent Save)" : "PNG / JPG (Permanent Save)" }}
+            {{ locale === "vi" ? "PNG / JPG (Lưu trữ vĩnh viễn)" : "PNG / JPG (Permanent Save)" }}
           </span>
         </div>
       </div>
@@ -357,7 +354,6 @@ const handleKeydown = (e: KeyboardEvent) => {
         <div class="lightbox-container" @click.stop>
           <div class="lightbox-top-bar">
             <button
-              v-if="isLocal"
               class="lightbox-delete-btn"
               @click.stop="deleteImage(activeLightboxImage.id, activeLightboxImage.name, $event)"
               :title="locale === 'vi' ? 'Loại bỏ ảnh này' : 'Remove this image'"
@@ -513,18 +509,34 @@ const handleKeydown = (e: KeyboardEvent) => {
   background: var(--color-accent-400, #ff7f11);
   color: #ffffff;
   border: none;
-  padding: 10px 20px;
+  padding: 8px 20px;
   border-radius: 999px;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 700;
   cursor: pointer;
   box-shadow: 0 4px 14px rgba(255, 127, 17, 0.35);
   transition: all 0.2s cubic-bezier(0.25, 1, 0.5, 1);
+  white-space: nowrap;
 
-  &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(255, 127, 17, 0.5);
-    background: #ff8c2a;
+  @media (min-width: 861px) {
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+
+    &:hover {
+      transform: translateY(calc(-50% - 2px));
+      box-shadow: 0 6px 20px rgba(255, 127, 17, 0.5);
+      background: #ff8c2a;
+    }
+  }
+
+  @media (max-width: 860px) {
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(255, 127, 17, 0.5);
+      background: #ff8c2a;
+    }
   }
 
   &:active {
@@ -532,8 +544,8 @@ const handleKeydown = (e: KeyboardEvent) => {
   }
 
   .icon-upload {
-    width: 18px;
-    height: 18px;
+    width: 16px;
+    height: 16px;
   }
 }
 

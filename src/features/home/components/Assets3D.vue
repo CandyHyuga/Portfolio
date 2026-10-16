@@ -75,16 +75,6 @@ const loadingMessage = ref(locale.value === "vi" ? "Đang nạp mô hình 3D..."
 const showBlenderGuide = ref(false);
 const isNavGuideCollapsed = ref(false);
 
-// Check if running on local development/preview vs live production (GitHub Pages)
-const isLocal = computed(() => {
-  if (typeof window === "undefined") return false;
-  return (
-    import.meta.env.DEV ||
-    window.location.hostname === "localhost" ||
-    window.location.hostname === "127.0.0.1"
-  );
-});
-
 // Blender 5.2 Scale & Dimensions State
 type ScaleMode = "autofit" | "1x" | "3x" | "0.01x" | "100x";
 const currentScaleMode = ref<ScaleMode>("autofit");
@@ -1483,11 +1473,10 @@ const onFileInputChange = (e: Event) => {
 };
 
 const onDragOver = () => {
-  if (isLocal.value) isDragOver.value = true;
+  isDragOver.value = true;
 };
 
 const onDrop = (e: DragEvent) => {
-  if (!isLocal.value) return;
   isDragOver.value = false;
   if (e.dataTransfer?.files && e.dataTransfer.files.length > 0) {
     handle3DFiles(e.dataTransfer.files);
@@ -1594,7 +1583,7 @@ onUnmounted(() => {
     <div class="grid">
       <div
         class="assets-viewer-card"
-        :class="{ 'is-drag-over': isLocal && isDragOver }"
+        :class="{ 'is-drag-over': isDragOver }"
         @dragover.prevent="onDragOver"
         @dragleave.prevent="isDragOver = false"
         @drop.prevent="onDrop"
@@ -1831,8 +1820,8 @@ onUnmounted(() => {
               </button>
             </div>
 
-            <!-- Upload & Blender Compatibility Actions (Local Only) -->
-            <div v-if="isLocal" class="toolbar-upload-group">
+            <!-- Upload & Blender Compatibility Actions -->
+            <div class="toolbar-upload-group">
               <button
                 class="toolbar-btn guide-btn"
                 @click="showBlenderGuide = true"
@@ -1848,38 +1837,36 @@ onUnmounted(() => {
                 <span>{{ locale === 'vi' ? 'Hướng dẫn Blender' : 'Blender Guide' }}</span>
               </button>
 
-              <template v-if="isLocal">
-                <input
-                  ref="fileInputRef"
-                  type="file"
-                  accept=".glb,.gltf,.fbx,.obj,.png,.jpg,.jpeg,.tga"
-                  multiple
-                  class="hidden-file-input"
-                  @change="onFileInputChange"
-                />
-                <button
-                  class="toolbar-btn upload-btn"
-                  @click="fileInputRef?.click()"
-                  :title="locale === 'vi' ? 'Hỗ trợ tệp FBX kèm texture hoặc GLB xuất từ Blender 5.2' : 'Supports textured FBX or GLB exported from Blender 5.2'"
-                  data-sound="click"
-                  data-hoversound="hover"
-                >
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                    <polyline points="17 8 12 3 7 8"></polyline>
-                    <line x1="12" y1="3" x2="12" y2="15"></line>
-                  </svg>
-                  <div class="upload-btn-text">
-                    <span>{{ locale === 'vi' ? 'Tải lên 3D (FBX / GLB)' : 'Upload 3D (FBX / GLB)' }}</span>
-                    <small>{{ locale === 'vi' ? 'Blender 5.2 • FBX kèm texture / GLB' : 'Blender 5.2 • Textured FBX / GLB' }}</small>
-                  </div>
-                </button>
-              </template>
+              <input
+                ref="fileInputRef"
+                type="file"
+                accept=".glb,.gltf,.fbx,.obj,.png,.jpg,.jpeg,.tga"
+                multiple
+                class="hidden-file-input"
+                @change="onFileInputChange"
+              />
+              <button
+                class="toolbar-btn upload-btn"
+                @click="fileInputRef?.click()"
+                :title="locale === 'vi' ? 'Hỗ trợ tệp FBX kèm texture hoặc GLB xuất từ Blender 5.2' : 'Supports textured FBX or GLB exported from Blender 5.2'"
+                data-sound="click"
+                data-hoversound="hover"
+              >
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                  <polyline points="17 8 12 3 7 8"></polyline>
+                  <line x1="12" y1="3" x2="12" y2="15"></line>
+                </svg>
+                <div class="upload-btn-text">
+                  <span>{{ locale === 'vi' ? 'Tải lên 3D (FBX / GLB)' : 'Upload 3D (FBX / GLB)' }}</span>
+                  <small>{{ locale === 'vi' ? 'Blender 5.2 • FBX kèm texture / GLB' : 'Blender 5.2 • Textured FBX / GLB' }}</small>
+                </div>
+              </button>
             </div>
           </div>
 
           <!-- Drag & Drop Overlay -->
-          <div v-if="isLocal && isDragOver" class="drag-drop-modal">
+          <div v-if="isDragOver" class="drag-drop-modal">
             <div class="drag-drop-content">
               <span class="upload-icon">📥</span>
               <p v-if="locale === 'vi'">Thả tệp <strong>.FBX (kèm textures)</strong> hoặc <strong>.GLB</strong> từ Blender 5.2 vào đây</p>
@@ -1925,7 +1912,7 @@ onUnmounted(() => {
               <span class="concept-name">{{ concept.name }}</span>
               <span class="concept-vi">{{ locale === 'vi' ? concept.nameVi : concept.nameEn }}</span>
             </div>
-            <span v-if="isLocal && customModelNames.has(concept.id)" class="concept-custom-badge">Blender 📁</span>
+            <span v-if="customModelNames.has(concept.id)" class="concept-custom-badge">Blender 📁</span>
           </button>
         </div>
       </div>
@@ -1953,14 +1940,14 @@ onUnmounted(() => {
               <span class="concept-name">{{ concept.name }}</span>
               <span class="concept-vi">{{ locale === 'vi' ? concept.nameVi : concept.nameEn }}</span>
             </div>
-            <span v-if="isLocal && customModelNames.has(concept.id)" class="concept-custom-badge">Blender 📁</span>
+            <span v-if="customModelNames.has(concept.id)" class="concept-custom-badge">Blender 📁</span>
           </button>
         </div>
       </div>
     </div>
 
-    <!-- Blender Export Guide Modal (Local Only) -->
-    <div v-if="isLocal && showBlenderGuide" class="guide-modal-backdrop" @click.self="showBlenderGuide = false">
+    <!-- Blender Export Guide Modal -->
+    <div v-if="showBlenderGuide" class="guide-modal-backdrop" @click.self="showBlenderGuide = false">
       <div class="guide-modal">
         <div class="guide-modal-header">
           <h3>{{ locale === 'vi' ? '📦 Hướng dẫn xuất file từ Blender 5.2 sang Web3D' : '📦 Blender 5.2 to Web3D Export Guide' }}</h3>
