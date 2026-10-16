@@ -7,6 +7,8 @@ import {
   SphereGeometry,
   ConeGeometry,
   TorusGeometry,
+  RingGeometry,
+  DoubleSide,
   PointLight,
 } from "three";
 
@@ -1211,6 +1213,164 @@ function createWaterLotusPondRealistic(): Group {
   return g;
 }
 
+// 15. The Backrooms
+function createBackrooms(): Group {
+  const g = new Group();
+  const carpetMat = new MeshBasicMaterial({ color: 0xc8bc7a });
+  const wallpaperMat = new MeshBasicMaterial({ color: 0xdfd48f });
+  const darkWallMat = new MeshBasicMaterial({ color: 0xb5aa6b });
+  const lightMat = new MeshBasicMaterial({ color: 0xffffee });
+
+  g.add(createBasePedestal(3.2, carpetMat));
+
+  // Partition Walls (Liminal yellow wallpaper walls)
+  const wall1 = new Mesh(new BoxGeometry(0.2, 2.6, 4.2), wallpaperMat);
+  wall1.position.set(-1.2, 1.55, 0.4);
+  const wall2 = new Mesh(new BoxGeometry(3.6, 2.6, 0.2), wallpaperMat);
+  wall2.position.set(0.6, 1.55, -1.6);
+  const wall3 = new Mesh(new BoxGeometry(2.0, 2.6, 0.2), darkWallMat);
+  wall3.position.set(0.8, 1.55, 1.2);
+  const wall4 = new Mesh(new BoxGeometry(0.2, 2.6, 1.8), wallpaperMat);
+  wall4.position.set(1.8, 1.55, -0.2);
+
+  // Doorway header
+  const doorway = new Mesh(new BoxGeometry(0.2, 0.7, 1.2), wallpaperMat);
+  doorway.position.set(-1.2, 2.5, -1.0);
+
+  // Fluorescent Light Fixture
+  const fixture = new Mesh(new BoxGeometry(1.6, 0.08, 0.5), lightMat);
+  fixture.position.set(0, 2.7, 0);
+  const pLight = new PointLight(0xfff5cc, 1.8, 6.0);
+  pLight.position.set(0, 2.5, 0);
+
+  g.add(wall1, wall2, wall3, wall4, doorway, fixture, pLight);
+  return g;
+}
+
+// 16. Planet
+function createPlanet(): Group {
+  const g = new Group();
+  const spaceBaseMat = new MeshBasicMaterial({ color: 0x1a1528 });
+  const planetMat = new MeshBasicMaterial({ color: 0x6b4c9a });
+  const stripeMat = new MeshBasicMaterial({ color: 0x9b6bc4 });
+  const ringMat = new MeshBasicMaterial({ color: 0xd4af37, side: DoubleSide });
+  const moonMat = new MeshBasicMaterial({ color: 0x48cae4 });
+
+  g.add(createBasePedestal(3.2, spaceBaseMat));
+
+  // Central Planet Sphere
+  const planet = new Mesh(new SphereGeometry(1.4, 32, 24), planetMat);
+  planet.position.set(0, 2.0, 0);
+
+  // Planet Cloud / Mineral Band
+  const band = new Mesh(new TorusGeometry(1.41, 0.12, 12, 48), stripeMat);
+  band.rotation.x = Math.PI / 3;
+  band.position.set(0, 2.0, 0);
+
+  // Planetary Ring
+  const ring = new Mesh(new RingGeometry(1.8, 2.8, 48), ringMat);
+  ring.rotation.x = Math.PI / 2.6;
+  ring.rotation.y = Math.PI / 8;
+  ring.position.set(0, 2.0, 0);
+
+  // Little Moons
+  const moon1 = new Mesh(new SphereGeometry(0.25, 16, 16), moonMat);
+  moon1.position.set(2.4, 2.7, 0.8);
+  const moon2 = new Mesh(new SphereGeometry(0.16, 12, 12), stripeMat);
+  moon2.position.set(-2.2, 1.4, -1.0);
+
+  const starLight = new PointLight(0xcdb4db, 1.6, 7.0);
+  starLight.position.set(1.5, 3.5, 2.0);
+
+  g.add(planet, band, ring, moon1, moon2, starLight);
+  return g;
+}
+
+// 17. Alien Farm
+function createAlienFarm(): Group {
+  const g = new Group();
+  const soilMat = new MeshBasicMaterial({ color: 0x2e1a47 });
+  const cropStemMat = new MeshBasicMaterial({ color: 0x00b4d8 });
+  const cropPodMat = new MeshBasicMaterial({ color: 0xe040fb });
+  const sporeGlowMat = new MeshBasicMaterial({ color: 0x69f0ae });
+  const saucerMat = new MeshBasicMaterial({ color: 0x78909c });
+
+  g.add(createBasePedestal(3.2, soilMat));
+
+  // Rows of Bioluminescent Alien Crops
+  const cropPositions: Array<[number, number]> = [
+    [-1.2, -0.8], [-1.2, 0.4], [-1.2, 1.6],
+    [0.0, -1.2], [0.0, 0.0], [0.0, 1.2],
+    [1.2, -0.8], [1.2, 0.4], [1.2, 1.6],
+  ];
+
+  cropPositions.forEach(([x, z], idx) => {
+    const stemHeight = 0.6 + (idx % 3) * 0.2;
+    const stem = new Mesh(new CylinderGeometry(0.04, 0.08, stemHeight, 8), cropStemMat);
+    stem.position.set(x, 0.25 + stemHeight / 2, z);
+
+    const pod = new Mesh(new SphereGeometry(0.18, 12, 12), idx % 2 === 0 ? cropPodMat : sporeGlowMat);
+    pod.position.set(x, 0.25 + stemHeight + 0.12, z);
+
+    g.add(stem, pod);
+  });
+
+  // Irrigation Saucer Drone Floating Above
+  const saucer = new Mesh(new CylinderGeometry(0.65, 0.85, 0.18, 24), saucerMat);
+  saucer.position.set(0, 2.6, 0);
+  const dome = new Mesh(new SphereGeometry(0.35, 16, 16), sporeGlowMat);
+  dome.position.set(0, 2.76, 0);
+  const beam = new PointLight(0x00e5ff, 2.0, 5.0);
+  beam.position.set(0, 2.2, 0);
+
+  g.add(saucer, dome, beam);
+  return g;
+}
+
+// 18. Constella
+function createConstella(): Group {
+  const g = new Group();
+  const astralBaseMat = new MeshBasicMaterial({ color: 0x0b132b });
+  const crystalMat = new MeshBasicMaterial({ color: 0x48cae4, transparent: true, opacity: 0.88 });
+  const goldStarMat = new MeshBasicMaterial({ color: 0xffd166 });
+  const coreMat = new MeshBasicMaterial({ color: 0xffffff });
+
+  g.add(createBasePedestal(3.2, astralBaseMat));
+
+  // Floating Crystalline Obelisks
+  const crystalCoords = [
+    { x: -1.0, z: -0.6, h: 2.2, r: 0.25 },
+    { x: 0.8, z: -1.0, h: 2.6, r: 0.3 },
+    { x: 1.2, z: 0.8, h: 1.8, r: 0.22 },
+    { x: -0.7, z: 1.1, h: 1.9, r: 0.24 },
+  ];
+
+  crystalCoords.forEach(({ x, z, h, r }) => {
+    const obelisk = new Mesh(new CylinderGeometry(0.02, r, h, 6), crystalMat);
+    obelisk.position.set(x, 0.25 + h / 2, z);
+    g.add(obelisk);
+  });
+
+  // Central Celestial Orb
+  const starCore = new Mesh(new SphereGeometry(0.55, 24, 24), coreMat);
+  starCore.position.set(0, 1.8, 0);
+
+  // Orbiting Star Constellations
+  for (let i = 0; i < 7; i++) {
+    const angle = (i / 7) * Math.PI * 2;
+    const rad = 1.3 + (i % 2) * 0.4;
+    const star = new Mesh(new SphereGeometry(0.09, 8, 8), goldStarMat);
+    star.position.set(Math.cos(angle) * rad, 1.8 + Math.sin(angle * 2) * 0.35, Math.sin(angle) * rad);
+    g.add(star);
+  }
+
+  const astralLight = new PointLight(0x90e0ef, 2.2, 6.0);
+  astralLight.position.set(0, 2.0, 0);
+
+  g.add(starCore, astralLight);
+  return g;
+}
+
 export function createConceptDiorama(conceptId: string): Group {
   switch (conceptId) {
     case "hanoi-train-street":
@@ -1248,6 +1408,15 @@ export function createConceptDiorama(conceptId: string): Group {
       return createTavernDungeon();
     case "gnome-table":
       return createGnomeTable();
+    // New concepts
+    case "backrooms":
+      return createBackrooms();
+    case "planet":
+      return createPlanet();
+    case "alien-farm":
+      return createAlienFarm();
+    case "constella":
+      return createConstella();
     default:
       return createHanoiTrainStreet();
   }

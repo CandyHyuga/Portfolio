@@ -18,6 +18,10 @@ Bạn có thể lưu trữ các file 3D (.fbx, .glb) trực tiếp vào các th�
 | `water-lotus-pond/` | Water Lotus Pond / Đầm sen tươi tốt (Stylized) | `WaterLotusPond.fbx` |
 | `mushroom-house-realistic/` | Mushroom House / Nhà nấm cổ tích (Realistic) | `NhaNam1.fbx` (`MushroomHouse.fbx`) |
 | `water-lotus-pond-realistic/` | Water Lotus Pond / Đầm sen tươi tốt (Realistic) | `WaterLotusPond.fbx` |
+| `backrooms/` | Backrooms / Căn phòng vô tận | `Backrooms.fbx` |
+| `planet/` | Planet / Hành tinh kỳ bí | `Planet.fbx` |
+| `alien-farm/` | Alien Farm / Nông trại ngoài hành tinh | `AlienFarm.fbx` |
+| `constella/` | Constella / Chòm sao tinh tú | `Constella.fbx` |
 
 ### 💡 Lưu ý khi xuất file từ Blender 5.2:
 - **Định dạng .FBX**: Trong Blender, chọn `File > Export > FBX (.fbx)`, đặt `Path Mode: Copy` và bấm bật icon `Embed Textures`.
