@@ -294,17 +294,17 @@ const gamblingGnomesConcepts: EnvironmentConcept[] = [
   },
   {
     id: "backrooms",
-    name: "Backrooms",
-    nameVi: "Căn phòng vô tận",
-    nameEn: "Can phong vo tan",
-    category: "Liminal Space",
-    icon: "🚪",
-    mood: "Liminal & Eerie",
-    lighting: "Flickering Fluorescent",
+    name: "Dreamcore",
+    nameVi: "lạc trong giấc mơ",
+    nameEn: "lac trong giac mo",
+    category: "Dreamcore / Liminal",
+    icon: "☁️",
+    mood: "Surreal & Dreamlike",
+    lighting: "Dreamy Pastel Glow",
     polyTarget: "9,600 Δ",
     project: "gambling-gnomes",
     defaultModelFile: "/models/concepts/backrooms/Backrooms.fbx",
-    defaultModelName: "Backrooms.fbx",
+    defaultModelName: "Dream.fbx",
   },
   {
     id: "planet",
@@ -681,6 +681,17 @@ const processTextureBlackAlpha = (texture: any) => {
   }
 };
 
+let vitDuckSharedTexture: Texture | null = null;
+const getVitDuckTexture = (): Texture => {
+  if (!vitDuckSharedTexture) {
+    vitDuckSharedTexture = new TextureLoader().load(
+      getAbsoluteAssetUrl("/models/concepts/backrooms/Vit_Base_color_1001.png")
+    );
+    vitDuckSharedTexture.colorSpace = SRGBColorSpace;
+  }
+  return vitDuckSharedTexture;
+};
+
 // Convert any mesh material to Base Color (MeshBasicMaterial) with true Alpha cutout support (matching Blender Principled BSDF Alpha node)
 const convertMeshToBaseColor = (mesh: Mesh) => {
   // Hide accidental floating reference card left high up in Blender file
@@ -701,6 +712,24 @@ const convertMeshToBaseColor = (mesh: Mesh) => {
         map: mat.map || null,
         wireframe: false,
       });
+    }
+
+    const isVitDuck =
+      /vit/i.test(mat.name || "") ||
+      /vit/i.test(mesh.name || "") ||
+      (mat.map && mat.map.name && /vit/i.test(mat.map.name));
+
+    if (isVitDuck) {
+      basicMat.map = getVitDuckTexture();
+      basicMat.color = new Color(0xffffff);
+      basicMat.opacity = 1.0;
+      basicMat.transparent = false;
+      basicMat.depthWrite = true;
+      basicMat.depthTest = true;
+      basicMat.side = DoubleSide;
+      basicMat.name = mat.name || "Vit_BaseColor";
+      basicMat.needsUpdate = true;
+      return basicMat;
     }
 
     const isCayLieuFoliage =
@@ -1325,6 +1354,13 @@ const loadModelFromUrl = async (url: string, fileName: string, conceptId: string
     const manager = new LoadingManager();
     const basePath = fullUrl.includes("/") ? fullUrl.substring(0, fullUrl.lastIndexOf("/") + 1) : "";
 
+    manager.setURLModifier((assetUrl) => {
+      if (/vit.*udim/i.test(assetUrl) || /vit_base_color/i.test(assetUrl) || /vit\.png/i.test(assetUrl)) {
+        return getAbsoluteAssetUrl("/models/concepts/backrooms/Vit_Base_color_1001.png");
+      }
+      return assetUrl;
+    });
+
     if (ext === "fbx") {
       const fbxLoader = new FBXLoader(manager);
       const group = fbxLoader.parse(arrayBuffer, basePath);
@@ -1375,6 +1411,12 @@ const loadConcept = async (conceptId: string) => {
   if (saved) {
     const ext = saved.fileName.split(".").pop()?.toLowerCase();
     const manager = new LoadingManager();
+    manager.setURLModifier((assetUrl) => {
+      if (/vit.*udim/i.test(assetUrl) || /vit_base_color/i.test(assetUrl) || /vit\.png/i.test(assetUrl)) {
+        return getAbsoluteAssetUrl("/models/concepts/backrooms/Vit_Base_color_1001.png");
+      }
+      return assetUrl;
+    });
     try {
       if (ext === "fbx") {
         const fbxLoader = new FBXLoader(manager);

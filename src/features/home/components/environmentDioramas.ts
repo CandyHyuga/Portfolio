@@ -1483,6 +1483,7 @@ export function createConceptDiorama(conceptId: string): Group {
       return createGnomeTable();
     // New concepts
     case "backrooms":
+    case "dreamcore":
       return createBackrooms();
     case "planet":
       return createPlanet();
