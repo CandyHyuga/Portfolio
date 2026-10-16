@@ -318,7 +318,7 @@ const gamblingGnomesConcepts: EnvironmentConcept[] = [
     polyTarget: "14,200 Δ",
     project: "gambling-gnomes",
     defaultModelFile: "/models/concepts/planet/Planet.fbx",
-    defaultModelName: "Planet.fbx",
+    defaultModelName: "planets.fbx",
   },
   {
     id: "alien-farm",
@@ -332,21 +332,7 @@ const gamblingGnomesConcepts: EnvironmentConcept[] = [
     polyTarget: "15,800 Δ",
     project: "gambling-gnomes",
     defaultModelFile: "/models/concepts/alien-farm/AlienFarm.fbx",
-    defaultModelName: "AlienFarm.fbx",
-  },
-  {
-    id: "constella",
-    name: "Constella",
-    nameVi: "Chòm sao tinh tú",
-    nameEn: "Constella Astral",
-    category: "Astral Fantasy",
-    icon: "✨",
-    mood: "Celestial & Shimmering",
-    lighting: "Nebula & Stellar Glow",
-    polyTarget: "12,500 Δ",
-    project: "gambling-gnomes",
-    defaultModelFile: "/models/concepts/constella/Constella.fbx",
-    defaultModelName: "Constella.fbx",
+    defaultModelName: "Farm.fbx",
   },
 ];
 
@@ -1303,6 +1289,20 @@ const processLoadedModel = async (
 ) => {
   clearCurrentModel();
 
+  // Stand upright orientation:
+  // Blender uses Z-up. When FBX models are exported with Apply Transform or raw coordinates,
+  // child nodes have rotation.x = 0, causing the model to lie flat horizontally in Three.js (which uses Y-up).
+  // Rotating -90 deg (-Math.PI / 2) around X aligns Blender Z-up to Three.js Y-up so all objects stand upright.
+  const isFbx = fileName.toLowerCase().endsWith(".fbx");
+  const isFarm = conceptId === "alien-farm" || fileName.toLowerCase().includes("farm");
+  const childrenHaveZeroX =
+    object.children.length > 0 &&
+    object.children.every((c) => Math.abs(c.rotation.x) < 0.05);
+
+  if (isFarm || (isFbx && childrenHaveZeroX)) {
+    object.rotation.x = -Math.PI / 2;
+  }
+
   if (isRealisticTarget(fileName, conceptId, object)) {
     isCurrentRealisticModel.value = true;
     loadingMessage.value =
@@ -1558,6 +1558,21 @@ const toggleAutoRotate = () => {
 };
 
 const resetCamera = () => {
+  fitCameraToModel(currentModelGroup, currentScaleMode.value);
+};
+
+const rotateModelUpright = () => {
+  if (currentModelGroup.children.length === 0) return;
+  const model = currentModelGroup.children[0];
+  if (!model) return;
+
+  // Rotate 90 degrees around X axis to stand upright or cycle orientation
+  model.rotation.x -= Math.PI / 2;
+  if (model.rotation.x <= -Math.PI * 2 + 0.01) {
+    model.rotation.x = 0;
+  }
+
+  model.updateMatrixWorld(true);
   fitCameraToModel(currentModelGroup, currentScaleMode.value);
 };
 
@@ -1873,6 +1888,20 @@ onUnmounted(() => {
                   <path d="M3 3v5h5"/>
                 </svg>
                 <span>{{ locale === 'vi' ? 'Đặt lại' : 'Reset' }}</span>
+              </button>
+
+              <!-- Rotate Upright (Dựng thẳng đứng) -->
+              <button
+                class="toolbar-btn"
+                @click="rotateModelUpright"
+                :title="locale === 'vi' ? 'Dựng thẳng đứng / Xoay trục 90° (Khắc phục mô hình Blender bị nằm ngang)' : 'Stand upright / Rotate axis 90° (Fix Blender models lying flat)'"
+                data-sound="click"
+                data-hoversound="hover"
+              >
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M12 3v18M5 10l7-7 7 7"/>
+                </svg>
+                <span>{{ locale === 'vi' ? 'Đứng thẳng' : 'Stand Upright' }}</span>
               </button>
             </div>
 
