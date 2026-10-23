@@ -7,7 +7,7 @@ export default {
   logo: personalProjectThumbnail,
   tags: ["blender", "unity", "unreal"],
   description:
-    "study set-up assets from Alissa Corbut model in Sketchfab",
+    "study set-up assets from Alissa Corbut's model in Sketchfab",
   components: [
     {
       type: "media",
