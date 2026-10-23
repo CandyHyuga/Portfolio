@@ -7,7 +7,7 @@ export default {
   logo: personalProjectThumbnail,
   tags: ["blender", "unity", "unreal"],
   description:
-    "A personal 3D environment art exploration featuring a mystical astral chamber with floating golden stars, occult props, and atmospheric lighting.",
+    "study set-up assets from Alissa Corbut model in Sketchfab",
   components: [
     {
       type: "media",
