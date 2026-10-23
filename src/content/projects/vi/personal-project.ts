@@ -7,7 +7,7 @@ export default {
   logo: personalProjectThumbnail,
   tags: ["blender", "unity", "unreal"],
   description:
-    "Dự án cá nhân khám phá thiết kế môi trường 3D, kiến trúc nội thất huyền bí (Astral Chamber) với ánh sáng lung linh và đạo cụ ma thuật.",
+    "study set-up assets from Alissa Corbut model in Sketchfab",
   components: [
     {
       type: "media",
